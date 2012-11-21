@@ -5,18 +5,11 @@
       <title>{% block title %}RPG{% endblock %}</title>
       % endblock
       <link rel="stylesheet" type="text/css"
-         href="{{ url_for('static', filename='base.css') }}" />
+         href="{{ url_for('static', filename='css/base.css') }}" />
+      <script type="text/javascript"
+         src="{{ url_for('static', filename='js/rpg.js') }}"></script>
    </head>
    <body>
-      <div class="loginBar">
-         <div class="status">
-            % if logged_id
-               <a href="{{ url_for('logout') }}">Log Out</a>
-            % else
-               <a href="{{ url_for('login_page') }}">Log In</a>
-            % endif
-         </div>
-      </div>
       % block body
       % endblock
    </body>
