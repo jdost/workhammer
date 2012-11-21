@@ -28,7 +28,7 @@ def html_base():
     '''
     return {
         "logged_id": 'id' in session,
-        "user": User.get(session['id']) if 'id' in session else None
+        "user": User.lookup(session['id']) if 'id' in session else None
     }
 
 
