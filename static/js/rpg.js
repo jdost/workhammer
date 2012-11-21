@@ -1,1 +1,1 @@
-lib/rpg.js
+../../lib/rpg.js
