@@ -75,7 +75,8 @@ def players():
     ''' players -> GET /player
     Returns an array of the players
     '''
-    return Player.all()
+    players = Player.all()
+    return {"players": players} if request.is_html else players
 
 
 @app.route("/player/<player_id>", methods=["GET"])
