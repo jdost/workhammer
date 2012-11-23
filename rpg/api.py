@@ -3,6 +3,7 @@ This is a collection of generic API functions, this mostly provides simple
 things that don't really fall under other categories.  Helps flush out how the
 API works and adds nice functionality and features to it.
 '''
+from flask import session
 from . import app
 from .decorators import datatype
 
@@ -15,7 +16,8 @@ def index():
     application, used for discovery.  (Don't hardcode any of the endpoints
     in your API usage, use this packet to discover the API tree!)
     '''
-    return app.endpoints
+    return dict(app.endpoints.items() + [("logged_in", session['id']
+                if 'id' in session else None)])
 
 
 @app.endpoint('/version')
