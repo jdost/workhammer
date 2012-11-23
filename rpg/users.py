@@ -5,7 +5,7 @@ users.  Mainly handling registering, logging in/out, account changes, etc.
 from flask import request, redirect, url_for, session
 from . import app, password_hash, logger
 from .database import User, errors, Sessions
-from .decorators import datatype
+from .decorators import datatype, require_permissions
 import httplib
 
 
@@ -71,3 +71,14 @@ def logout():
     Sessions.remove(session['_id'])
     session.clear()
     return redirect(url_for('index')) if request.is_html else httplib.ACCEPTED
+
+
+@app.endpoint('/user', methods=['GET'])
+@datatype
+@require_permissions
+def user():
+    ''' user -> GET /user
+    Returns the User document for the user currently logged in as.  Used for
+    getting the username and other User info when currently logged in.
+    '''
+    return User.lookup(id=session['id'])
