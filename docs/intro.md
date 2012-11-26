@@ -10,6 +10,7 @@ functionality.
 1. [Login](login.md)
 1. [Players](players.md)
 1. [Quests](quests.md)
+1. [Skills](skills.md)
 1. [Usage](usage.md)
 
 ## Terminology
