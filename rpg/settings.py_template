@@ -5,6 +5,7 @@ can be added here.
 '''
 DEBUG = True  # change to False for a Prod environment, enables debug handlers
 SECRET_KEY = "ChangeMeIShouldBeASecret"  # should be unique to your instance
+SESSION_KEY = "rpg_session"
 MONGO_HOST = {
     "host": "localhost",  # Address of the machine hosting the service
     "port": 27017  # Port service is listening on (default: 27017)

@@ -2,7 +2,7 @@ from flask.sessions import SessionInterface, SessionMixin
 from . import settings
 from .database import Sessions
 
-SESSION_KEY = settings.SECRET_KEY
+SESSION_KEY = settings.SESSION_KEY
 
 
 class Session(dict, SessionMixin):
