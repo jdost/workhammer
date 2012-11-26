@@ -11,6 +11,7 @@ functionality.
 1. [Players](players.md)
 1. [Quests](quests.md)
 1. [Skills](skills.md)
+1. [Classes](classes.md)
 1. [Usage](usage.md)
 
 ## Terminology
