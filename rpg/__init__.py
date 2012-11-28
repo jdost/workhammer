@@ -3,7 +3,7 @@ import settings
 import hashlib
 from importlib import import_module
 
-__version__ = "0.1"
+__version__ = "0.2"
 # List of the modules to import
 __all__ = ["users", "players", "quests", "skills", "api", "html"]
 
