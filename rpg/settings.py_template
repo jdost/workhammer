@@ -16,3 +16,7 @@ STATIC = {  # settings for serving static files in debug mode
     "folder": "../static",  # serves the /lib folder in debug mode
     "path": "/s"  # static files are served under /s in debug mode
 }
+SERVING = {
+   "host": "0.0.0.0",
+   "port": 5000
+}
