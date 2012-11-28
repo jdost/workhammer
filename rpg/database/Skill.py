@@ -22,13 +22,11 @@ def __complex(packet):
     ''' __complex
     Returns a more complex version of the Skill document (versus __simple)
     '''
-    return {
-        "name": packet["name"],
-        "id": str(packet["_id"]),
-        "url": url_for("get_skill", skill_id=str(packet["_id"])),
-        "formula": packet["formula"],
-        "bonus": packet["bonus"]
-    }
+    packet["id"] = str(packet["_id"])
+    packet["url"] = url_for("get_skill", skill_id=packet["id"])
+    del packet["_id"]
+
+    return packet
 
 
 def create(info, user_id):

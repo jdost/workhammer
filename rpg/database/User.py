@@ -15,13 +15,14 @@ def __private_user(packet):
     Helper function, takes the raw mongo user document and returns only the
     whitelisted (key, value) pairs that the user should see
     '''
-    private_packet = {
-        "username": packet["username"],
-        "id": str(packet["_id"]),
-        "role": map(lambda k: roles_lookup.get(k), packet["role"])
-    }
-    if "player" in packet:
-        private_packet["player"] = str(packet["player"])
+    private_packet = {}
+    private_packet.update(packet)
+    private_packet["id"] = str(private_packet["_id"])
+    private_packet["role"] = map(lambda k: roles_lookup.get(k), packet["role"])
+    del private_packet["_id"]
+
+    if "player" in private_packet:
+        private_packet["player"] = str(private_packet["player"])
 
     return private_packet
 

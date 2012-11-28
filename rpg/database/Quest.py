@@ -23,13 +23,11 @@ def __complex(packet):
     ''' __complex
     Returns a more complex version of the Quest document (versus __simple)
     '''
-    return {
-        "name": packet["name"],
-        "id": str(packet["_id"]),
-        "description": packet["description"],
-        "url": url_for("get_quest", quest_id=str(packet["_id"])),
-        "rewards": packet["rewards"]
-    }
+    packet["id"] = str(packet["_id"])
+    packet["url"] = url_for("get_quest", quest_id=packet["id"])
+    del packet["_id"]
+
+    return packet
 
 
 def create(info, user_id):
