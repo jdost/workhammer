@@ -44,3 +44,11 @@ def ObjectId(src):
         raise errors.NoEntryError(
             "Information provided to find a document used an ID not from " +
             "the system.")
+
+
+def convert_id(packet):
+    ''' Converts the BSON ObjectId of a document into the nice string
+    representation for the end user.
+    '''
+    packet["id"] = str(packet["_id"])
+    del packet["_id"]

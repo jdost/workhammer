@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import url_for
-from . import collection, has_keys, ObjectId
+from . import collection, has_keys, ObjectId, convert_id
 from . import errors
 database = collection("skills")
 
@@ -22,9 +22,8 @@ def __complex(packet):
     ''' __complex
     Returns a more complex version of the Skill document (versus __simple)
     '''
-    packet["id"] = str(packet["_id"])
+    convert_id(packet)
     packet["url"] = url_for("get_skill", skill_id=packet["id"])
-    del packet["_id"]
 
     return packet
 
