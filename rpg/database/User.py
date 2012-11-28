@@ -1,6 +1,5 @@
-from bson.objectid import ObjectId
 from datetime import datetime
-from . import collection
+from . import collection, ObjectId
 from . import errors
 from .. import roles
 database = collection("users")

@@ -1,7 +1,6 @@
-from bson.objectid import ObjectId
 from flask import url_for
 from datetime import datetime
-from . import collection, has_keys
+from . import collection, has_keys, ObjectId
 from . import errors
 database = collection("quests")
 
