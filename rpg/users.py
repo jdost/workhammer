@@ -32,7 +32,7 @@ def register():
     logger.info("Username %s registered.", username)
 
     return redirect(url_for('index')) if request.is_html else \
-        (str(id), httplib.CREATED)
+        ('"' + str(id) + '"', httplib.CREATED)
 
 
 @app.endpoint('/login', methods=['POST'])

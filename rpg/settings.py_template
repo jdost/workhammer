@@ -17,10 +17,10 @@ STATIC = {  # settings for serving static files in debug mode
     "path": "/s"  # static files are served under /s in debug mode
 }
 SKILL_DEFAULT = {  # default settings for quick skill creation
-   "formula": "100*n",  # skills level at 100, 200, 300, etc
-   "bonus": 15  # leveling a skill gives 15 XP
+    "formula": "100*n",  # skills level at 100, 200, 300, etc
+    "bonus": 15  # leveling a skill gives 15 XP
 }
 SERVING = {
-   "host": "0.0.0.0",
-   "port": 5000
+    "host": "0.0.0.0",
+    "port": 5000
 }
