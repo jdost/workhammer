@@ -19,6 +19,11 @@ class TestBase(unittest.TestCase):
     default_player = {
         "name": "TestPlayer"
     }
+    default_quest = {
+        "name": "Run Test",
+        "description": "Run the test suite",
+        "rewards": {}
+    }
 
     def register(self, user=None):
         ''' TestBase::register
@@ -67,6 +72,22 @@ class TestBase(unittest.TestCase):
         self.assertEqual(player["name"], new_player["name"],
                          "Returned player's name is not the defined name.")
         return new_player
+
+    def create_quest(self, quest=None):
+        ''' TestBase::create_quest
+        Helper method, creates a quest entry with the provided information.
+        If no information provided, uses the self.quest as default.
+        '''
+        quest = quest if quest else self.default_quest
+        response = self.app.post(self.endpoints["quests"]["url"],
+                                 data=json.dumps(quest),
+                                 content_type="application/json",
+                                 headers=self.json_header)
+        self.assertHasStatus(response, httplib.CREATED)
+        new_quest = json.loads(response.data)
+        self.assertEqual(quest["name"], new_quest["name"],
+                         "Returned quest's name is not the defined name.")
+        return new_quest
 
     def setUp(self):
         ''' TestBase::setUp

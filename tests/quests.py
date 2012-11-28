@@ -36,18 +36,6 @@ class QuestTest(TestBase):
         TestBase.setUp(self)
         self.register(self.root_user)
 
-    def create_quest(self, quest=None):
-        ''' QuestTest::create_quest
-        '''
-        quest = quest if quest else self.quest
-        response = self.app.post(self.endpoints["quests"]["url"],
-                                 data=json.dumps(quest),
-                                 content_type="application/json",
-                                 headers=self.json_header)
-        self.assertHasStatus(response, httplib.CREATED)
-        new_quest = json.loads(response.data)
-        return new_quest
-
     def get_quest_list(self):
         ''' QuestTest::get_quest_list
         '''
@@ -60,7 +48,7 @@ class QuestTest(TestBase):
         ''' Tests creating just a basic quest
         Creates a basic quest (just rewards basic experience).
         '''
-        quest = self.create_quest()
+        quest = self.create_quest(self.quest)
         response = self.app.get(quest["url"],
                                 headers=self.json_header)
         self.assertHasStatus(response, httplib.OK)
@@ -85,7 +73,7 @@ class QuestTest(TestBase):
 
         self.assertHasStatus(self.login(self.root_user), httplib.OK)
 
-        quest = self.create_quest()
+        quest = self.create_quest(self.quest)
         # complete quest with the quest URL as the access point
         response = self.app.post(quest["url"],
                                  data={"player_id": player['id']},
