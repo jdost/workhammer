@@ -1,0 +1,8 @@
+% extends "base.html"
+% block body
+<ul>
+   % for skill in skills
+   <li><a href={{ skill["url"] }}>{{ skill["name"] }}</a></li>
+   % endfor
+</ul>
+% endblock

@@ -28,7 +28,8 @@ def __complex(packet):
         "id": str(packet["_id"]),
         "age": str(datetime.utcnow() - packet["created"]),
         "url": url_for('get_player', player_id=str(packet["_id"])),
-        "experience": packet["experience"]
+        "experience": packet["experience"],
+        "skills": packet["skills"]
     }
 
 
@@ -45,6 +46,7 @@ def create(info, user_id):
 
     info.update({
         'experience': 0,
+        'skills': {},
 
         'created': datetime.utcnow(),
         'created_by': ObjectId(user_id),
