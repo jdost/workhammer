@@ -1,0 +1,8 @@
+% extends "base.html"
+% block body
+<ul>
+   % for quest in quests
+   <li><a href={{ quest["url"] }}>{{ quest["name"] }}</a></li>
+   % endfor
+</ul>
+% endblock
