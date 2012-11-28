@@ -76,7 +76,7 @@ class TestBase(unittest.TestCase):
     def create_quest(self, quest=None):
         ''' TestBase::create_quest
         Helper method, creates a quest entry with the provided information.
-        If no information provided, uses the self.quest as default.
+        If no information provided, uses the self.default_quest as default.
         '''
         quest = quest if quest else self.default_quest
         response = self.app.post(self.endpoints["quests"]["url"],
