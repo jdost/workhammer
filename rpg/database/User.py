@@ -17,6 +17,7 @@ def __private_user(packet):
     '''
     private_packet = packet.copy()
     convert_id(private_packet)
+    del private_packet["password"]
     private_packet["role"] = map(lambda k: roles_lookup.get(k), packet["role"])
 
     if "player" in private_packet:
