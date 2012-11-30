@@ -57,7 +57,7 @@ def create_player():
             session["role"] = session["role"] + [roles.PLAYER]
 
         User.modify({  # This adds the PLAYER role to the user
-            "role": session["role"] + [roles.PLAYER],
+            "role": session["role"],
             "id": player_info["user"],
             "player": ObjectId(id)
         }, session["id"])
