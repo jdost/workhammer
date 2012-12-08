@@ -97,7 +97,7 @@ class TestBase(unittest.TestCase):
         rpg.app.config['TESTING'] = True
         rpg.app.debug = False
         self.app = rpg.app.test_client()
-        response = self.app.get('/', content_type="application/json")
+        response = self.app.get('/', headers=self.json_header)
         self.endpoints = json.loads(response.data)
 
     def tearDown(self):

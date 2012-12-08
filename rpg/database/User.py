@@ -52,8 +52,7 @@ def create(info, user_role=None):
 
     if user_role is None:
         user_role = []
-
-    if type(user_role) is not list:
+    elif type(user_role) is not list:
         user_role = [user_role]
 
     if database.count() == 0:
