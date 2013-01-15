@@ -57,12 +57,12 @@ level capacity).  The current settings are:
   a newly created session, mostly will be things like the default number of items
   returned for large lists (paginated) and the default datetime format.  (nothing
   for now)
-* *STATIC* dictionary that describes how the built in debugging server should map
+* **STATIC** dictionary that describes how the built in debugging server should map
   the static files, the path is for the URL path (so `localhost/s/js/rpg.js` by
   default) and the folder is the relative path to the folder that the static
   requests looks in.
-* *SKILL_DEFAULT* a dictionary that describes the default values for a created
+* **SKILL_DEFAULT** a dictionary that describes the default values for a created
   skill, used for quick skill creation (i.e. just give a name and it will have these
   values filled in by default)
-* *SERVING* a dictionary passed into the debug server on how the page is being
+* **SERVING** a dictionary passed into the debug server on how the page is being
   served including the host and port
