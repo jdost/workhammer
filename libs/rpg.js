@@ -25,7 +25,6 @@ window.rpg = (function (lib) {
 
   var ajax = function (args) {
     if (!args) { return false; }
-    console.log(jQuery);
 
     if (jQuery) { // If jQuery is available, use it to perform the ajax request
       return jQuery.ajax(args);
@@ -78,7 +77,7 @@ window.rpg = (function (lib) {
     } else {
       xhr.send(null);
     }
-    return true;
+    return xhr;
   };
 
 
