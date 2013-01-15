@@ -1,5 +1,6 @@
 *.pyc
 settings.py
+static/js/rpg.js
 
 env/*
 .env/*
