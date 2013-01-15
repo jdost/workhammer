@@ -12,10 +12,11 @@ a log of their quests, an inventory and track what of that inventory is equiped.
 The player model will need to track all of these things (and more as features and
 concepts get added/implemented).
 
+(those marked with a ^ are controlled by the server via other calls)
+
 * Name
 * Attached Login
-* Experience
+* Experience^
 * Class
-* Inventory
-* Equipped
-* Quests
+* Quests^
+* Skills^

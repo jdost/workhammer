@@ -1,2 +1,3 @@
 from rpg import app
-app.run()
+from rpg import settings
+app.run(**settings.SERVING)

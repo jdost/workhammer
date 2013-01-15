@@ -69,7 +69,7 @@ class JSONEncoder(json.JSONEncoder):
     '''
     def default(self, obj):
         if isinstance(obj, ObjectId):  # ObjectId used in mongo
-            return str(ObjectId)
+            return str(obj)
         elif isinstance(obj, datetime.datetime):  # datetime used for dates
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)

@@ -1,7 +1,6 @@
-from bson.objectid import ObjectId
 from flask import url_for
 from datetime import datetime
-from . import collection, has_keys
+from . import collection, has_keys, ObjectId, convert_id
 from . import errors
 database = collection("quests")
 
@@ -24,13 +23,10 @@ def __complex(packet):
     ''' __complex
     Returns a more complex version of the Quest document (versus __simple)
     '''
-    return {
-        "name": packet["name"],
-        "id": str(packet["_id"]),
-        "description": packet["description"],
-        "url": url_for("get_quest", quest_id=str(packet["_id"])),
-        "rewards": packet["rewards"]
-    }
+    convert_id(packet)
+    packet["url"] = url_for("get_quest", quest_id=packet["id"])
+
+    return packet
 
 
 def create(info, user_id):

@@ -13,6 +13,14 @@ backend generated HTML interface (to start).  It is written to use virtualenv.  
 will be done with good test coverage and against the flake8 (pyflakes + PEP8)
 linting utility.
 
+## Requirements
+
+This project requires a few things to be run on a system.  You should have Python
+installed (the version that it is developed against is 2.7, so no guarantees for
+anything else for now).  Ideally, also at least virtualenv (and possibly
+virtualenvwrapper) at least on the initial setup.  Pip should also be installed.
+Finally mongo is needed for the Database side of the application.
+
 ## Setup
 
 For setup, if you have virtualenvwrapper and make installed you can just run:
@@ -49,3 +57,12 @@ level capacity).  The current settings are:
   a newly created session, mostly will be things like the default number of items
   returned for large lists (paginated) and the default datetime format.  (nothing
   for now)
+* *STATIC* dictionary that describes how the built in debugging server should map
+  the static files, the path is for the URL path (so `localhost/s/js/rpg.js` by
+  default) and the folder is the relative path to the folder that the static
+  requests looks in.
+* *SKILL_DEFAULT* a dictionary that describes the default values for a created
+  skill, used for quick skill creation (i.e. just give a name and it will have these
+  values filled in by default)
+* *SERVING* a dictionary passed into the debug server on how the page is being
+  served including the host and port

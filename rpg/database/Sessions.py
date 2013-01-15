@@ -1,5 +1,4 @@
-from bson.objectid import ObjectId
-from . import collection
+from . import collection, ObjectId
 database = collection("sessions")
 
 

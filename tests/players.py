@@ -74,7 +74,7 @@ class PlayerTest(TestBase):
         '''
         response = self.register()
         self.assertHasStatus(response, httplib.CREATED)
-        id = response.data
+        id = json.loads(response.data)
         self.assertTrue(self.logout(), "Logout failed.")
 
         response = self.login(self.root_user)

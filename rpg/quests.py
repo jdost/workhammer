@@ -6,12 +6,12 @@ completed by players.
 '''
 from flask import session, request
 from . import app, filter_keys
-from . import roles, logger
+from . import roles, logger, skills
 from .decorators import datatype, require_permissions
 from .database import Quest, QuestLog, errors, Player
 import httplib
 # Keys that the user cannot directly change (controlled by app)
-reserved_keys = []
+reserved_keys = ["created", "created_by", "modified", "modified_by"]
 
 
 @app.route("/quest", methods=["POST"])
@@ -106,11 +106,16 @@ def apply_quest(quest, player):
     the rewards from the quest and applies them to the player (gives them).
 
     Reward types:
-      <int> - added to the player property
-      TODO: add more types (figure out what they should be)
+      experience - added to the player's XP pool
+      skills - loops through the set, adds new skills, updates existing ones
     '''
-    modifications = {"id": player["id"]}
-    for (reward_type, reward)in quest["rewards"].items():
+    modifications = {"id": player["id"], "experience": player["experience"]}
+    if "skills" in quest["rewards"]:  # Handle skills
+        modifications["skills"] = player["skills"]
+        for (skill, points) in quest["rewards"]["skills"].items():
+            modifications = skills.update_skill(modifications, skill, points)
+
+    for (reward_type, reward) in quest["rewards"].items():
         if type(reward) is int:
             modifications[reward_type] = player[reward_type] + reward
 

@@ -1,7 +1,6 @@
-from bson.objectid import ObjectId
 from flask import url_for
 from datetime import datetime
-from . import collection
+from . import collection, ObjectId
 from . import Player, Quest
 database = collection("questlog")
 
