@@ -31,3 +31,4 @@ the DMs and performed by the players.
 rewards from other quests when equipped.
 * **Class**: This will be attached to skill areas in the real world, things that
 pertain to various specialities and will affect the rewards from quests.
+* *Skill*: Attributes/stats for the player, these are changed via quests
