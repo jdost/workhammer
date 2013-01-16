@@ -18,16 +18,20 @@ def __clean(packet):
             'id': str(packet['player']),
             'url': url_for('get_player', player_id=str(packet['player']))
         },
+        'status': packet['status'],
+        'url': url_for('complete_quest', log_id=str(packet['_id'])),
         'completed': packet['created']
     }
 
 
-def add(quest_id, player_id, user_id):
+def add(quest_id, player_id, user_id, status=0):
     ''' QuestLog::add
     Creates an entry in the QuestLog for the `player_id` completing the
     `quest_id`.  Uses the `user_id` to note who marked this Quest as being
-    completed.  Returns the full Quest and Player documents (lookup was used
-    to make sure the id's are existing entries).
+    completed.  The `status` argument reflects the status of the quest being
+    added to the table, used for tracking the status of the quest's progress.
+    Returns the full Quest and Player documents (lookup was used to make sure
+    the id's are existing entries).
     '''
     quest = Quest.get(quest_id)
     player = Player.get(player_id)
@@ -36,7 +40,8 @@ def add(quest_id, player_id, user_id):
         'quest': ObjectId(quest_id),
         'player': ObjectId(player_id),
         'created_by': ObjectId(user_id),
-        'created': datetime.utcnow()
+        'created': datetime.utcnow(),
+        'status': status
     })
 
     return str(id), quest, player
@@ -61,3 +66,33 @@ def get(quest=None, player=None):
     quests = database.find(search)
 
     return [__clean(q) for q in quests]
+
+
+def uncompleted(player_id=None):
+    ''' QuestLog::uncompleted
+    Gets a <list> of the quests in the table that have not been completed (do
+    not have a status of `0`).
+    '''
+    spec = {"status": {"$ne": 0}}
+    if player_id:
+        spec['player'] = ObjectId(player_id)
+
+    quests = database.find(spec)
+
+    return [__clean(q) for q in quests]
+
+
+def update(request_id, status=0):
+    ''' QuestLog::update
+    Updates the `status` property of the QuestLog entry designated by the
+    `request_id` argument.  If no status is provided, assumes the request is
+    being marked as completed.  Returns the updated request upon success.
+    '''
+    request = database.find_one(ObjectId(request_id))
+    request['status'] = status
+    database.save(request)
+
+    quest = Quest.get(request['quest'])
+    player = Player.get(request['player'])
+
+    return __clean(request), quest, player

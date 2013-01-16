@@ -7,7 +7,7 @@ completed by players.
 from flask import session, request
 from . import app, filter_keys
 from . import roles, logger, skills
-from .decorators import datatype, require_permissions
+from .decorators import datatype, require_permissions, intersect
 from .database import Quest, QuestLog, errors, Player
 import httplib
 # Keys that the user cannot directly change (controlled by app)
@@ -69,12 +69,14 @@ def get_quest(quest_id):
 @app.route("/quest/<quest_id>", methods=["POST"])
 @app.route("/player/<player_id>", methods=["POST"])
 @datatype
-@require_permissions(roles.ROOT, roles.ADMIN)
-def complete_quest(player_id=None, quest_id=None):
+@require_permissions
+def request_quest(player_id=None, quest_id=None):
     ''' complete_quest -> POST /quest/<quest_id>
-            POST: player_id=[string]
+            POST: player_id=[string](optional)&status=[integer](optional)
         complete_quest -> POST /player/<player_id>
-            POST: quest_id=[string]
+            POST: quest_id=[string]&status=[integer](optional)
+    Marks an attempt on a quest by a specified player.  If being done by a user
+    with administrative permissions, can be marked as completed, if done by
     Stores that the specified player has completed the specified quest, will
     perform the updates to the Player based on the rewards of the completed
     quest.  This requires that the user performing this request has permissions
@@ -82,17 +84,68 @@ def complete_quest(player_id=None, quest_id=None):
     '''
     player_id = request.form.get('player_id', player_id)
     quest_id = request.form.get('quest_id', quest_id)
+    status = int(request.form.get('status', "1"))
+
+    if status == 0 and not \
+            intersect([roles.ROOT, roles.ADMIN], session['role']):
+        status = 1  # only DM users can set completion
+
+    if not player_id and roles.PLAYER in session['role']:
+        player_id = session['player']
     if not quest_id and not player_id:
         return "Need both the player and quest to mark the completion.", \
             httplib.BAD_REQUEST
 
     try:
-        id, quest, player = QuestLog.add(quest_id, player_id, session['id'])
+        id, quest, player = QuestLog.add(quest_id, player_id,
+                                         session['id'], status)
+        if status == 0:
+            apply_quest(quest, player)
+            logger.info("%s (%s) completed %s (%s), reported by %s",
+                        player["name"], player["id"], quest["name"],
+                        quest["id"], session["id"])
+        else:
+            logger.info("%s (%s) attempted %s (%s), reported by %s",
+                        player["name"], player["id"], quest["name"],
+                        quest["id"], session["id"])
+    except errors.NoEntryError as err:
+        logger.info(err)
+        return "A given ID is not for an existing entry.", httplib.NOT_FOUND
+
+    return httplib.ACCEPTED
+
+
+@app.endpoint("/request/", methods=["GET"])
+@app.route("/request/<player_id>", methods=["GET"])
+@datatype
+@require_permissions
+def requests(player_id=None):
+    ''' requests -> GET /request/
+    Returns a list of the uncompleted quests, if the current user does not have
+    administrative rights, will default to the current user's player.
+    '''
+    if not intersect([roles.ROOT, roles.ADMIN], session['role']):
+        player_id = session['player']
+    return QuestLog.uncompleted(player_id)
+
+
+@app.route("/request/<log_id>", methods=["POST"])
+@datatype
+@require_permissions(roles.ROOT, roles.ADMIN)
+def complete_quest(log_id):
+    ''' complete_quest -> POST /request/<request_id>
+            POST: state=[int]
+    Stores that the specified quest request has been completed, will
+    perform the updates to the Player based on the rewards of the completed
+    quest.  This requires that the user performing this request has permissions
+    to do so.
+    '''
+    try:
+        log, quest, player = QuestLog.update(log_id)
         apply_quest(quest, player)
-        logger.info("%s (%s) completed %s (%s), reported by %s",
+        logger.info("%s (%s) completed %s (%s), approve by %s",
                     player["name"], player["id"], quest["name"], quest["id"],
                     session["id"])
-        # Need to update the Player object now with the completed quest
     except errors.NoEntryError as err:
         logger.info(err)
         return "A given ID is not for an existing entry.", httplib.NOT_FOUND
