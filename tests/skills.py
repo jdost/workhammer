@@ -118,7 +118,7 @@ class SkillTest(TestBase):
         quest = self.create_quest(quest)
 
         response = self.app.post(quest["url"],
-                                 data={"player_id": player['id']},
+                                 data={"player_id": player['id'], "status": 0},
                                  headers=self.json_header)
         self.assertHasStatus(response, httplib.ACCEPTED)
 

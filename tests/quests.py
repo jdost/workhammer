@@ -95,7 +95,7 @@ class QuestTest(TestBase):
         quest = self.create_quest(self.quest)
         # complete quest with the quest URL as the access point
         response = self.app.post(quest["url"],
-                                 data={"player_id": player['id']},
+                                 data={"player_id": player['id'], "status": 0},
                                  headers=self.json_header)
         self.assertHasStatus(response, httplib.ACCEPTED)
 
@@ -131,7 +131,7 @@ class QuestTest(TestBase):
         quest = self.create_quest(self.quest)
         # complete quest with the player URL as the access point
         response = self.app.post(player["url"],
-                                 data={"quest_id": quest['id']},
+                                 data={"quest_id": quest['id'], "status": 0},
                                  headers=self.json_header)
         self.assertHasStatus(response, httplib.ACCEPTED)
 
