@@ -88,7 +88,7 @@ def update(request_id, status=0):
     `request_id` argument.  If no status is provided, assumes the request is
     being marked as completed.  Returns the updated request upon success.
     '''
-    request = database.find({"_id": ObjectId(request_id)})
+    request = database.find_one(ObjectId(request_id))
     request['status'] = status
     database.save(request)
 
