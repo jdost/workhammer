@@ -1,12 +1,15 @@
 # Classes
 
 Classes are specializations the player builds up.  The player can then focus on one
-class or spread the work across multiple classes.
+class or spread the work across multiple classes.  Classes are all controlled
+passively, meaning they do not select any class but are opted into all classes that
+exist (and you have some XP in).
 
 ## Leveling
 
-Quests can either give experience directly to a class (so the 'UI Polishing' Quest
-could give 10 XP to the Frontend Developer) or give experience to the player's
-experience pool (so the 'Complete Project' Quest could give 10 XP to the pool).
-The experience in the pool does not factor into anything, it is just a holding place
-that the User that controls the player can allocate to different classes.
+Quests that level up a skill will give weighted amounts of the XP bonus the skill
+grants to each class.  So a frontend developer class would have a weight of 1 for
+the JS coding skill, so when the skill levels up and grants its 15 XP bonus, it will
+give that full bonus to the frontend developer class.  But the unit testing skill
+only has a weight of 0.5 for the frontend developer class, so it's 20 XP bonus only
+grants 10 XP to the class (0.5*20).
