@@ -140,3 +140,17 @@ class ClassTest(TestBase):
         player_info = json.loads(response.data)
         self.assertIn(cls["id"], player_info["classes"])
         self.assertEqual(player_info["level"], 1)
+
+    def test_update_class(self):
+        ''' Tests creating and then modifying a class
+        Creates a class, then updates the class with the new information, makes
+        sure that the class updated.
+        '''
+        cls = self.create_class(self.default_class)
+        cls["name"] = "New Class"
+        response = self.app.put(cls["url"], data=json.dumps(cls),
+                                content_type="application/json",
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+        new_cls = json.loads(response.data)
+        self.assertEqual(new_cls["name"], cls["name"])

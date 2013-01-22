@@ -5,7 +5,7 @@ based on weighted bonus addition.  As classes level up (in a similar way to
 how skills level up), the combined levels of all classes for a player
 constitute the total level of the player.
 '''
-from flask import session, request
+from flask import session, request, redirect, url_for
 from . import app, filter_keys, calc_level
 from . import roles, logger
 from .decorators import datatype, require_permissions
@@ -64,7 +64,33 @@ def get_class(class_id):
 
     return class_info
 
-# /class/<class_id> PUT
+
+@app.route("/class/<class_id>", methods=["PUT"])
+@datatype
+def modify_class(class_id):
+    ''' modify_class -> PUT /class/<class_id>
+        PUT: <JSON DATA>
+    Submits a set of information to use to modify the class specified by the
+    <class_id> parameter.
+    '''
+    if not request.json:
+        return "PUT body must be a JSON document for the class to be " + \
+            "updated.", httplib.BAD_REQUEST
+
+    class_info = request.json
+    class_info['id'] = class_id
+
+    try:
+        class_info = Class.modify(class_info, session['id'])
+        if not class_info:
+            return httplib.BAD_REQUEST
+    except errors.NonMongoDocumentError as err:
+        logger.info(err)
+        return "Trying to modify a non existent class", httplib.BAD_REQUEST
+
+    return redirect(url_for('get_class', class_id=class_id)) \
+        if request.is_html else (class_info, httplib.ACCEPTED)
+
 # /class/<class_id>/leaders GET
 
 
