@@ -115,3 +115,17 @@ class SkillTest(TestBase):
         self.assertEqual(player_skill["level"], 1, "Skill level not correct.")
         self.assertEqual(player_skill["points"], skill_points, "The skill " +
                          "points are not correct.")
+
+    def test_update_skill(self):
+        ''' Tests creating and then modifying a skill
+        Creates a skill, then updates the skill with new information, makes
+        sure that the skill updated.
+        '''
+        skill = self.create_skill(self.skill)
+        skill["name"] = "New Skill"
+        response = self.app.put(skill["url"], data=json.dumps(skill),
+                                content_type="application/json",
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+        new_skill = json.loads(response.data)
+        self.assertEqual(new_skill["name"], skill["name"])
