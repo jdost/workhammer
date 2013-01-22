@@ -5,7 +5,7 @@ from importlib import import_module
 
 __version__ = "0.2"
 # List of the modules to import
-__all__ = ["users", "players", "quests", "skills", "api", "html"]
+__all__ = ["users", "players", "quests", "skills", "classes", "api", "html"]
 
 
 def cleanup():
@@ -36,6 +36,23 @@ def filter_keys(src, blacklist):
             del src[key]
 
     return src
+
+
+def calc_level(formula, xp, level=0):
+    ''' calc_level
+    Given a formula for the xp required for each level and the current xp,
+    calculate the current level
+    '''
+    level_xp = 0
+    while level_xp <= xp:
+        level += 1
+        temp = eval(formula, {"__builtins__": None},
+                    {"n": level})
+        if temp == level_xp:  # catches static formulas (i.e. f(n) = 100)
+            return level - 1
+        level_xp = temp
+
+    return level - 1
 
 # Webapp initialization
 import session

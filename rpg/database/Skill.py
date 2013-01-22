@@ -4,7 +4,7 @@ from . import collection, has_keys, ObjectId, convert_id
 from . import errors
 database = collection("skills")
 
-skill_keys = ["name", "formula", "bonus"]
+skill_keys = ["name", "formula"]
 
 
 def __simple(packet):

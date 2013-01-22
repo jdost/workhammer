@@ -27,25 +27,8 @@ class SkillTest(TestBase):
 
     skill = {
         "name": "Testing",
-        "formula": "10*n",
-        "bonus": 25
+        "formula": "10*n"
     }
-
-    def create_skill(self, skill=None):
-        ''' SkillTest::create_skill
-        Helper method, creates a skill entry with the provided information.
-        If no information is provided, uses the self.default_skill as default.
-        '''
-        skill = skill if skill else self.default_skill
-        response = self.app.post(self.endpoints["skills"]["url"],
-                                 data=json.dumps(skill),
-                                 content_type="application/json",
-                                 headers=self.json_header)
-        self.assertHasStatus(response, httplib.CREATED)
-        new_skill = json.loads(response.data)
-        self.assertEqual(skill["name"], new_skill["name"],
-                         "Returned skill's name is not the defined name.")
-        return new_skill
 
     def setUp(self):
         ''' SkillTest::setUp
@@ -126,8 +109,6 @@ class SkillTest(TestBase):
                                 headers=self.json_header)
         self.assertHasStatus(response, httplib.OK)
         data = json.loads(response.data)
-        self.assertEqual(self.skill["bonus"], data["experience"], "The bonus" +
-                         " was not applied")
         self.assertIn(skill["id"], data["skills"], "Skill returned with " +
                       "player.")
         player_skill = data["skills"][skill["id"]]

@@ -43,6 +43,7 @@ def create(info, user_id):
     info.update({
         'experience': 0,
         'skills': {},
+        'classes': {},
 
         'created': datetime.utcnow(),
         'created_by': ObjectId(user_id),

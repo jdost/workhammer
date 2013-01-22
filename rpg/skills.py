@@ -3,10 +3,11 @@ This is a collection of functions that handle the creation, modification, and
 updating of skills.  The skills are natural attributes of the player characters
 that go up upon the completion of quests.
 '''
-from flask import request, session
-from . import app, filter_keys
+from flask import request, session, redirect, url_for
+from . import app, filter_keys, calc_level
 from . import roles, logger, settings
 from .decorators import datatype, require_permissions
+from .classes import update_class
 from .database import Skill, errors
 import httplib
 # Keys that the user cannot directly changed (controlled by the app)
@@ -30,8 +31,6 @@ def create_skill():
 
     if "formula" not in skill_info:
         skill_info["formula"] = settings.SKILL_DEFAULT["formula"]
-    if "bonus" not in skill_info:
-        skill_info["bonus"] = settings.SKILL_DEFAULT["bonus"]
 
     try:
         info, id = Skill.create(skill_info, session["id"])
@@ -57,7 +56,7 @@ def skills():
 @datatype("skill.html")
 def get_skill(skill_id):
     ''' get_skill -> GET /skill/<skill_id>
-    Returns the full description of the sill specified by <skill_id>.
+    Returns the full description of the skill specified by <skill_id>.
     '''
     try:
         skill = Skill.get(skill_id)
@@ -66,6 +65,35 @@ def get_skill(skill_id):
         return "The given ID was not found for the Skill.", httplib.NOT_FOUND
 
     return skill
+
+
+@app.route("/skill/<skill_id>", methods=["PUT"])
+@datatype
+def modify_skill(skill_id):
+    ''' modify_skill -> PUT /skill/<skill_id>
+        PUT: <JSON DATA>
+    Submits a set of information to use to modify the skill specified by the
+    <skill_id> parameter.
+    '''
+    if not request.json:
+        return "PUT body must be a JSON document for the skill to be " + \
+            "updated.", httplib.BAD_REQUEST
+
+    skill_info = request.json
+    skill_info['id'] = skill_id
+
+    try:
+        skill_info = Skill.modify(skill_info, session['id'])
+        if not skill_info:
+            return httplib.BAD_REQUEST
+    except errors.NonMongoDocumentError as err:
+        logger.info(err)
+        return "Trying to modify a non existent skill", httplib.BAD_REQUEST
+
+    return redirect(url_for('get_skill', skill_id=skill_id)) \
+        if request.is_html else (skill_info, httplib.ACCEPTED)
+
+# /skill/<skill_id>/leaders -> get list of leaders for the skill
 
 
 def base_skill():
@@ -82,7 +110,7 @@ def base_skill():
 def update_skill(player_mod, skill_id, points):
     ''' update_skill
     Helper function, takes a player modification dict (just holds the changes
-    to a player (not yet made).  Finds the skill based on the skill_id, updates
+    to a player not yet made).  Finds the skill based on the skill_id, updates
     the player's skill definition with the points and applies various changes
     per the skill being updated.
 
@@ -91,9 +119,11 @@ def update_skill(player_mod, skill_id, points):
         levels up every 100 SP, so they player would now have lvl 1 Cooking,
         giving them 15 XP.
 
-    { "skills": { <Cooking>: { "points": 99, "level": 0 }, "experience": 0}
+    { "skills": { <Cooking>: { "points": 99, "level": 0 },
+      "classes": { <Chef>: { "experience": 90, "level": 0 } }}
         becomes
-    { "skills": { <Cooking>: { "points": 108, "level": 1 }, "experience": 15}
+    { "skills": { <Cooking>: { "points": 108, "level": 1 },
+      "classes": { <Chef>: { "experience": 108, "level": 1 } }}
     '''
     try:
         skill = Skill.get(skill_id)
@@ -105,16 +135,13 @@ def update_skill(player_mod, skill_id, points):
         skill_id in player_mod["skills"] else base_skill()
     player_skill["points"] += points
 
-    # TODO: handle if the points amount is greater than the space between the
-    #   level, i.e. you have 10, you get 100 points, the levels are at 10*n,
-    #   so your new points would be 110, which would be level 11 (this would
-    #   set you at 2
-    new_level = eval(skill['formula'], {"__builtins__": None},
-                     {"n": player_skill["level"]}) <= player_skill["points"]
+    new_level = calc_level(skill['formula'], player_skill["points"],
+                           player_skill["level"])
 
-    if new_level:
-        player_skill["level"] += 1
-        player_mod["experience"] += skill["bonus"]
+    if new_level > player_skill["level"]:
+        change = new_level - player_skill["level"]
+        player_skill["level"] += change
+        player_mod = update_class(player_mod, skill, change)
         logger.info("Player leveled up skill %s to level %s.", skill_id,
                     player_skill["level"])
 
