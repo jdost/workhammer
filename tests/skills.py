@@ -27,25 +27,8 @@ class SkillTest(TestBase):
 
     skill = {
         "name": "Testing",
-        "formula": "10*n",
-        "bonus": 25
+        "formula": "10*n"
     }
-
-    def create_skill(self, skill=None):
-        ''' SkillTest::create_skill
-        Helper method, creates a skill entry with the provided information.
-        If no information is provided, uses the self.default_skill as default.
-        '''
-        skill = skill if skill else self.default_skill
-        response = self.app.post(self.endpoints["skills"]["url"],
-                                 data=json.dumps(skill),
-                                 content_type="application/json",
-                                 headers=self.json_header)
-        self.assertHasStatus(response, httplib.CREATED)
-        new_skill = json.loads(response.data)
-        self.assertEqual(skill["name"], new_skill["name"],
-                         "Returned skill's name is not the defined name.")
-        return new_skill
 
     def setUp(self):
         ''' SkillTest::setUp
@@ -126,11 +109,23 @@ class SkillTest(TestBase):
                                 headers=self.json_header)
         self.assertHasStatus(response, httplib.OK)
         data = json.loads(response.data)
-        self.assertEqual(self.skill["bonus"], data["experience"], "The bonus" +
-                         " was not applied")
         self.assertIn(skill["id"], data["skills"], "Skill returned with " +
                       "player.")
         player_skill = data["skills"][skill["id"]]
         self.assertEqual(player_skill["level"], 1, "Skill level not correct.")
         self.assertEqual(player_skill["points"], skill_points, "The skill " +
                          "points are not correct.")
+
+    def test_update_skill(self):
+        ''' Tests creating and then modifying a skill
+        Creates a skill, then updates the skill with new information, makes
+        sure that the skill updated.
+        '''
+        skill = self.create_skill(self.skill)
+        skill["name"] = "New Skill"
+        response = self.app.put(skill["url"], data=json.dumps(skill),
+                                content_type="application/json",
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+        new_skill = json.loads(response.data)
+        self.assertEqual(new_skill["name"], skill["name"])

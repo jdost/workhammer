@@ -165,6 +165,8 @@ def apply_quest(quest, player):
     modifications = {"id": player["id"], "experience": player["experience"]}
     if "skills" in quest["rewards"]:  # Handle skills
         modifications["skills"] = player["skills"]
+        modifications["classes"] = player["classes"]
+        modifications["level"] = player.get("level", 0)
         for (skill, points) in quest["rewards"]["skills"].items():
             modifications = skills.update_skill(modifications, skill, points)
 
