@@ -34,3 +34,8 @@ clean:
 
 serve:
 	python serve.py
+
+compile:
+	for file in $(basename $(notdir $(wildcard ./static/less/*.less))); do \
+		lessc ./static/less/$${file}.less ./static/css/$${file}.css; \
+	done;
