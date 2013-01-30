@@ -1,0 +1,40 @@
+@import ".colors.less";
+
+.options {
+  width: 30em;
+  left: 50%;
+  margin-left: -15em;
+
+  li {
+    list-style: none;
+    &:before {
+      content: ">";
+      visibility: hidden;
+    }
+
+    &:hover {
+      cursor: pointer;
+      &:before { visibility: visible; }
+    }
+  }
+}
+
+.menu {
+  width: 20em;
+  left: 50%;
+  margin-left: -10em;
+  background: @bg;
+
+  li {
+    list-style: none;
+    &:before {
+      content: ">";
+      visibility: hidden;
+    }
+
+    &:hover {
+      cursor: pointer;
+      &:before { visibility: visible; }
+    }
+  }
+}

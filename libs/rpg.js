@@ -22,11 +22,16 @@ window.rpg = (function (lib) {
 
 
   lib.loggedIn = function () { return loggedIn; }
+  lib.isReady = function () { return ready; }
 
   var ajax = function (args) {
     if (!args) { return false; }
 
     if (jQuery) { // If jQuery is available, use it to perform the ajax request
+      // Re-encode the data object to a JSON string if contentType is JSON
+      if (args.contentType && args.contentType === 'application/json') {
+        args.data = JSON.stringify(args.data);
+      }
       return jQuery.ajax(args);
     }
 
@@ -36,11 +41,7 @@ window.rpg = (function (lib) {
       if (xhr.readyState !== xhr.DONE) { return; }
       if (xhr.status >= 300) {  // Only error on status codes > 2xx
         if (!args.statusCode[xhr.status]) {
-          if (args.error) {
-            return args.error(xhr.responseText);
-          }
-
-          return;
+          return args.error ? args.error(xhr.responseText) : "";
         } else {
           return args.statusCode[xhr.status](xhr.responseText);
         }
@@ -51,9 +52,7 @@ window.rpg = (function (lib) {
       } catch (e) {
         var data = xhr.responseText;
       }
-      if (args.success) {
-        return args.success(data);
-      }
+      return args.success ? args.success(data) : "";
     };
     xhr.open(args.type ? args.type : 'GET', prefix + args.url, true);
     xhr.setRequestHeader("Accept", "application/json");
@@ -86,6 +85,7 @@ window.rpg = (function (lib) {
     jQuery.ajaxPrefilter(function (options) {
       options.url = prefix + options.url;
       options.dataType = 'json';
+      options.accepts = "application/json";
     });
   }
 
@@ -100,7 +100,7 @@ window.rpg = (function (lib) {
         if (typeof cb.success === 'function') { cb.success(data); }
       },
       error: function (data) {
-        if (typeof cb.error === 'function') { cb.error(msg); }
+        if (typeof cb.error === 'function') { cb.error(data); }
       }
     });
   };
@@ -301,10 +301,10 @@ window.rpg = (function (lib) {
 
     Retrieves either a list of short representations of all quests on the
     application (if no arguments given) or the full representation of the specific
-    player give (as the argument).
+    quest given (as the argument).
    **/
   lib.quest.get = function (quest, cb) {
-    if (!ready) { return queue.push(function () { lib.quest.get(quest); }); }
+    if (!ready) { return queue.push(function () { lib.quest.get(quest, cb); }); }
 
     var url = getURL(quest, routes.quest.url);
     if (typeof quest === 'object' && (quest.success || quest.error)) {
@@ -320,21 +320,12 @@ window.rpg = (function (lib) {
   /** quest.create
       args: quest - (hash table) describes the various properties of the quest to
               create
-            (optional) user - (id string) user to try and create the quest for, if
-              not defined, will create the quest for the logged in user
 
     Takes the hash table in and tries to create the quest using the provided
     properties.
    **/
-  lib.quest.create = function (quest, user, cb) {
+  lib.quest.create = function (quest, cb) {
     if (typeof quest !== 'object') { return false; }
-    if (typeof user === 'object' && user.id) {
-      quest.user = user.id;
-    } else if (typeof user === 'string') {
-      quest.user = user;
-    } else if (typeof user === 'object' && (user.success || user.error)) {
-      cb = user;
-    }
     cb = cb || {};
 
     return ajax({
@@ -368,6 +359,104 @@ window.rpg = (function (lib) {
       { 'player': player },
       'POST',
       cb);
+  };
+  // }}}
+
+  // skill {{{
+  lib.skill = {};
+  /** skill.get
+      args: (optional) skill - (skill object) skill object returned from app
+
+    Retrieves either a list of short representations of all skills on the
+    application (if no arguments given) or the full representation of the specific
+    skill given (as the argument).
+   **/
+  lib.skill.get = function (skill, cb) {
+    if (!ready) { return queue.push(function () { lib.skill.get(skill, cb); }); }
+
+    var url = getURL(skill, routes.skill.url);
+    if (typeof skill === 'object' && (skill.success || skill.error)) {
+      cb = skill;
+    }
+
+    return generic(
+      url,
+      '',
+      'GET',
+      cb);
+  };
+  /** skill.create
+      args: skill - (hash table) describes the various properties of the skill to
+              create
+
+    Takes the hash table in and tries to create the skill using the provided
+    properties.
+   **/
+  lib.skill.create = function (skill, cb) {
+    if (typeof skill !== 'object') { return false; }
+    cb = cb || {};
+
+    return ajax({
+      url: routes.skills.url,
+      type: 'POST',
+      contentType: 'application/json',
+      data: skill,
+      success: function (data) {
+        if (typeof cb.success === 'function') { cb.success(data); }
+      },
+      error: function (msg) {
+        if (typeof cb.error === 'function') { cb.error(msg); }
+      }
+    });
+  };
+  // }}}
+
+  // classes {{{
+  lib.classes = {};
+  /** classes.get
+      args: (optional) class - (class object) class object returned from app
+
+    Retrieves either a list of short representations of all classes on the
+    application (if no arguments given) or the full representation of the specific
+    class given (as the argument).
+   **/
+  lib.classes.get = function (cls, cb) {
+    if (!ready) { return queue.push(function () { lib.classes.get(cls, cb); }); }
+
+    var url = getURL(cls, classes.routes.url);
+    if (typeof cls === 'object' && (cls.success || cls.error)) {
+      cb = cls;
+    }
+
+    return generic(
+      url,
+      '',
+      'GET',
+      cb);
+  };
+  /** classes.create
+      args: class - (hash table) describes the various properties of the class to
+              create
+
+    Takes the hash table in and tries to create the class using the provided
+    properties.
+   **/
+  lib.classes.create = function (cls, cb) {
+    if (typeof cls !== 'object') { return false; }
+    cb = cb || {};
+
+    return ajax({
+      url: routes.classes.url,
+      type: 'POST',
+      contentType: 'application/json',
+      data: cls,
+      success: function (data) {
+        if (typeof cb.success === 'function') { cb.success(data); }
+      },
+      error: function (msg) {
+        if (typeof cb.error === 'function') { cb.error(msg); }
+      }
+    });
   };
   // }}}
 

@@ -66,3 +66,13 @@ app.debug = settings.DEBUG
 app.__version__ = __version__
 # This just imports all of the webapps modules (defined in __all__)
 map(lambda module: import_module("." + module, __name__), __all__)
+# This adds a helper function to templates for adding static URLs
+
+
+@app.context_processor
+def template_funcs():
+    from flask import url_for
+
+    def static(filename):
+        return url_for('static', filename=filename)
+    return dict(static=static)

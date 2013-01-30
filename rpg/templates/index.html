@@ -1,5 +1,17 @@
 % extends "base.html"
 % block body
-<script type="text/javascript" src="{{ url_for('static', filename="js/app.js") }}">
-   </script>
+<script type="text/javascript"
+   src="{{ static("js/app.js") }}"> </script>
+<script type="text/javascript"
+   src="{{ static("js/lib.js") }}"> </script>
+<script type="text/javascript"
+   src="{{ static("js/user.js") }}"> </script>
+<script type="text/javascript"
+   src="{{ static("js/player.js") }}"> </script>
+<script type="text/javascript"
+   src="{{ static("js/quests.js") }}"> </script>
+<script type="text/javascript"
+   src="{{ static("js/skills.js") }}"> </script>
+<script type="text/javascript"
+   src="{{ static("js/classes.js") }}"> </script>
 % endblock
