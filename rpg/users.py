@@ -25,7 +25,7 @@ def register():
         })
     except errors.ExistingUsernameError as err:
         logger.info(err)
-        return httplib.CONFLICT
+        return "Username already exists", httplib.CONFLICT
 
     session['id'] = str(id)
     session['role'] = role
