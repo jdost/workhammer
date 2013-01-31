@@ -41,7 +41,7 @@ def create_quest():
 
 
 @app.endpoint("/quest", methods=["GET"])
-@datatype("quests.html")
+@datatype
 def quests():
     ''' quests -> GET /quest
     Returns a <list> of all of the quests currently stored in the database
@@ -50,7 +50,7 @@ def quests():
 
 
 @app.route("/quest/<quest_id>", methods=["GET"])
-@datatype("quest.html")
+@datatype
 def get_quest(quest_id):
     ''' get_quest -> GET /quest/<quest_id>
     Returns the full description of the quest specified by <quest_id>, this

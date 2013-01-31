@@ -1,17 +1,37 @@
-% extends "base.html"
-% block body
-<script type="text/javascript"
-   src="{{ static("js/app.js") }}"> </script>
-<script type="text/javascript"
-   src="{{ static("js/lib.js") }}"> </script>
-<script type="text/javascript"
-   src="{{ static("js/user.js") }}"> </script>
-<script type="text/javascript"
-   src="{{ static("js/player.js") }}"> </script>
-<script type="text/javascript"
-   src="{{ static("js/quests.js") }}"> </script>
-<script type="text/javascript"
-   src="{{ static("js/skills.js") }}"> </script>
-<script type="text/javascript"
-   src="{{ static("js/classes.js") }}"> </script>
-% endblock
+<!doctype html>
+<html>
+   <head>
+      <title>Workhammer 401k</title>
+
+      <link rel="stylesheet/less" type="text/css"
+         href="{{ static('less/base.less') }}" />
+      <link rel="stylesheet/less" type="text/css"
+         href="{{ static('less/user.less') }}" />
+      <link rel="stylesheet/less" type="text/css"
+         href="{{ static('less/player.less') }}" />
+      <link rel="stylesheet/less" type="text/css"
+         href="{{ static('less/app.less') }}" />
+      <link href='http://fonts.googleapis.com/css?family=Press+Start+2P'
+         rel='stylesheet' type='text/css' />
+
+      <script type="text/javascript"
+         src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.3/underscore-min.js">
+         </script>
+      <script type="text/javascript"
+         src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+      <script type="text/javascript"
+         src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.3.3/less.min.js"></script>
+      <script type="text/javascript" src="{{ static('js/rpg.js') }}"></script>
+      <script type="text/javascript" src="{{ static('js/app.js') }}"></script>
+      <script type="text/javascript" src="{{ static('js/lib.js') }}"></script>
+      <script type="text/javascript" src="{{ static('js/menu.js') }}"></script>
+      <script type="text/javascript" src="{{ static('js/user.js') }}"></script>
+      <script type="text/javascript" src="{{ static('js/player.js') }}"></script>
+      <script type="text/javascript" src="{{ static('js/quests.js') }}"></script>
+      <script type="text/javascript" src="{{ static('js/skills.js') }}"></script>
+      <script type="text/javascript" src="{{ static('js/classes.js') }}"></script>
+   </head>
+   <body>
+      <div id="start">Press &lt;Esc&gt; to Start</div>
+   </body>
+</html>

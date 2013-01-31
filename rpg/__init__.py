@@ -5,7 +5,7 @@ from importlib import import_module
 
 __version__ = "0.2"
 # List of the modules to import
-__all__ = ["users", "players", "quests", "skills", "classes", "api", "html"]
+__all__ = ["users", "players", "quests", "skills", "classes", "api"]
 
 
 def cleanup():

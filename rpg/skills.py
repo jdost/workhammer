@@ -44,7 +44,7 @@ def create_skill():
 
 
 @app.endpoint("/skill", methods=["GET"])
-@datatype("skills.html")
+@datatype
 def skills():
     ''' skills -> GET /skill
     Returns a <list> of all of the quests currently stored in the database
@@ -53,7 +53,7 @@ def skills():
 
 
 @app.route("/skill/<skill_id>", methods=["GET"])
-@datatype("skill.html")
+@datatype
 def get_skill(skill_id):
     ''' get_skill -> GET /skill/<skill_id>
     Returns the full description of the skill specified by <skill_id>.
