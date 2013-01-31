@@ -10,7 +10,7 @@
     "show": function () {
       var user = window.user.getUser();
       if (!user) { return false; }
-      return user.role.isDM;
+      return user.roles.isDM;
     }
   })
   .add("Pending Quests", {
@@ -18,7 +18,7 @@
     "show": function () {
       var user = window.user.getUser();
       if (!user) { return false; }
-      return user.role.isDM;
+      return user.roles.isDM;
     }
   });
   // Template definition

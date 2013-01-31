@@ -7,7 +7,7 @@
     "show": function () {
       var user = window.user.getUser();
       if (!user) { return false; }
-      return !user.role.isPlayer;
+      return !user.roles.isPlayer;
     }
   })
   .add("Edit Player", {
@@ -15,7 +15,7 @@
     "show": function () {
       var user = window.user.getUser();
       if (!user) { return false; }
-      return user.role.isPlayer;
+      return user.roles.isPlayer;
     }
   });
   // Template definition

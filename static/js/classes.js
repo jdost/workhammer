@@ -10,7 +10,7 @@
     "show": function () {
       var user = window.user.getUser();
       if (!user) { return false; }
-      return user.role.isDM;
+      return user.roles.isDM;
     }
   });
   // Templates
