@@ -4,13 +4,24 @@ body {
   padding: 0;
   margin: 8em 0 0;
   background: @bg;
+  font-family: 'Press Start 2P', sans-serif;
+
   & * {
-    font-family: 'Press Start 2P', sans-serif;
+    font-family: inherit;
+    outline: none;
   }
+}
+a {
+  color: @fg;
+  text-decoration: none;
+}
+
+.container {
+  position: absolute;
+  width: 100%;
 }
 
 .window {
-  position: absolute;
   margin: 1em auto;
   border: 0.25em solid @blue;
   border-radius: 0.5em;

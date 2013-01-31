@@ -1,10 +1,44 @@
-window.app.user = (function (rpg) {
-  var exports = {},
-    self = this,
-    lib = app.lib,
+(function (exports) {
+  var rpg = window.rpg,
+    lib = window.lib,
+    win,
+    user = false,
+    loggedIn = false;
 
-    win;
-
+  rpg.ready(function () {
+    loggedIn = rpg.loggedIn();
+    if (loggedIn) { rpg.user.get({ success: buildUser }); }
+  });
+  var buildUser = function (u) {
+    user = u;
+    user.roles = {
+      "raw": u.role,
+      "isPlayer": u.role.indexOf("PLAYER") > -1,
+      "isDM": u.role.indexOf("ROOT") > -1 || u.role.indexOf("ADMIN") > -1
+    };
+  };
+  exports.getUser = function () { return user; };
+  // Menu listing creation
+  window.menu.add("Login", {
+    "exec": function () { return showLogin(); },
+    "show": function () {
+      return !loggedIn;
+    }
+  });
+  window.menu.add("Logout", {
+    "exec": function () {
+      rpg.user.logout({
+        success: function () {
+          loggedIn = false;
+          user = false;
+        }
+      });
+    },
+    "show": function () {
+      return loggedIn;
+    }
+  });
+  // Template definition
   var templates = {
     "loginForm": lib.template(function () { /*
         <form action="javascript:rpg.user.login;">
@@ -13,86 +47,67 @@ window.app.user = (function (rpg) {
         <input type="submit" name="Login" value="Login" />
       </form>
       <div class="message"></div>
-      <a id="register">Register</a>
+      <a id="register" href="javascript:;">Register</a>
       */}),
     "registerForm": lib.template(function () { /*
         <form action="javascript:rpg.user.register;">
         <input type="text" name="username" placeholder="username" />
         <input type="password" name="password" placeholder="password" />
+        <input type="password" name=".match" placeholder="repeat password" />
         <input type="submit" name="Register" value="Register" />
       </form>
       <div class="message"></div>
       */})
   };
 
-  var handleRegister = function (event) {
-    var pws = $(this).find(":password");
-    if (pws[0].valueOf() !== pws[1].valueOf()) {
-      return actFailure("Passwords don't match.");
-    }
-
-    var data = lib.getForm(this);
-
-    rpg.user.register(data, {
-      success: loginSuccess,
-      error: actFailure
-    });
-
-    return false;
-  };
-
-  exports.showLogin = function () {
+  var showLogin = function () {
+    if (win) { win.remove(); } // Remove the login window
     var loginWindow = lib.window("login");
 
     loginWindow.append(templates.loginForm())
-      .bind('success', loginSuccess)
-      .bind('error', actFailure)
-      .children("#register").click(exports.showRegister);
+      .bind('success', function (evt, data) { handleLogin(data); })
+      .bind('error', function (evt, msg) {
+        win.find(".message").text(msg.responseText);
+      })
+      .children("#register").click(showRegister);
 
-    $(document.body).append(loginWindow);
+    loginWindow.render();
     win = loginWindow;
   };
 
-  exports.showRegister = function () {
-    win.remove();
+  var showRegister = function () {
+    if (win) { win.remove(); } // Remove the login window
     var regWindow = lib.window("register");
 
     regWindow.append(templates.registerForm())
-      .bind('success', registerSuccess)
-      .bind('error', actFailure);
+      .bind('success', function (evt, data) {
+        rpg.user.get({
+          success: handleLogin
+        });
+      })
+      .bind('error', function (evt, msg) {
+        win.find(".message").text(msg.responseText);
+      });
 
-    $(document.body).append(regWindow);
+    regWindow.find("form").bind("submit", function (evt) {
+      var self = $(evt.target);
+      var pws = self.find(":password");
+
+      if (pws[0].value !== pws[1].value) {
+        regWindow.find(".message").text("Passwords must match");
+        evt.stopImmediatePropagation();
+        return false;
+      }
+    });
+
+    regWindow.render();
     win = regWindow;
   };
 
-  var logout = exports.logout = {
-    "activate":  function () {
-      rpg.user.logout({
-        success: function () {
-          app.menu.close();
-          app.menu.remove("Logout");
-        }
-      });
-    }
-  }
-
-  var loginSuccess = function (evt, data) {
-    app.loggedIn(data);
+  var handleLogin = function (data) {
+    loggedIn = true;
+    buildUser(_.isArray(data) ? data[0] : data);
+    app.loggedIn();
     win.remove();
   };
-  var registerSuccess = function (evt, data) {
-    rpg.user.get({
-      success: function (d) {
-        app.loggedIn(d);
-        win.remove();
-      }
-    });
-  };
-
-  var actFailure = function (evt, msg) {
-    msg = msg.responseText;
-    win.find(".message").text(msg);
-  };
-
-  return exports;
-}(window.rpg));
+}(window.user = {}));

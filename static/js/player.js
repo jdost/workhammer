@@ -1,5 +1,24 @@
 (function (exports) {
-  var lib = window.app.lib;
+  var lib = window.lib,
+    rpg = window.rpg;
+  // Menu listing creation
+  window.menu.add("Create Player", {
+    "exec": function () { return showBuilder(); },
+    "show": function () {
+      var user = window.user.getUser();
+      if (!user) { return false; }
+      return !user.role.isPlayer;
+    }
+  })
+  .add("Edit Player", {
+    "exec": function () { return showPlayer(); },
+    "show": function () {
+      var user = window.user.getUser();
+      if (!user) { return false; }
+      return user.role.isPlayer;
+    }
+  });
+  // Template definition
   var templates = {
     "builder": lib.template(function () {/*
       <form action="javascript:rpg.player.create;" method="POST"
@@ -14,17 +33,17 @@
       */})
   };
 
-  exports.showBuilder = function () {
+  var showBuilder = function () {
     var win = lib.window("player builder");
 
     win.append(templates.builder());
 
-    $(document.body).append(win);
-    win.bind("success", exports.showPlayer)
-      .bind("success", function () { win.remove(); });
+    win.render()
+      .bind("success", showPlayer)
+      .bind("success", win.remove);
   };
 
-  exports.showPlayer = function () {
+  var showPlayer = exports.showPlayer = function () {
     var win = lib.window("player viewer");
 
     rpg.player.get({
@@ -33,11 +52,6 @@
       }
     });
 
-    $(document.body).append(win);
-  };
-
-  exports.editPlayer = {
-    "activate": function () {
-    }
+    win.render();
   };
 }(window.player = {}));

@@ -21,8 +21,14 @@ window.rpg = (function (lib) {
     queue = []; // Queues up requests while waiting for the initial route request
 
 
-  lib.loggedIn = function () { return loggedIn; }
-  lib.isReady = function () { return ready; }
+  lib.loggedIn = function () { return loggedIn; };
+  lib.ready = function (func) {
+    if (typeof func === 'function') {
+      if (ready) { return func(); }
+      return queue.push(func);
+    }
+    return ready;
+  };
 
   var ajax = function (args) {
     if (!args) { return false; }
