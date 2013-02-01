@@ -7,9 +7,9 @@ to fit into the Javascript framework.
 
 The js files are all set to load in the `rpg/templates/index.html` file.  Just place
 your file below the other <script> tags like:
-{% highlight %}
+``` django
    <script type="text/javascript" src="{{ static('js/myextension.js') }}"></script>
-{% endhighlight %}
+```
 Where `myextension.js` is your js file.  The `static` function in the templates is
 useful for changing the static file location.  On development, the python app will
 serve the local files, but deployed, the files can live on any server (like AWS) and
@@ -22,7 +22,7 @@ to the menu, this is the window that pops up whenever you hit <Esc>.  This is th
 overall system to getting to different areas of the application (if you want to
 modify an existing window, you will need to edit the existing file).  To add a
 listing to the menu:
-{% highlight javascript %}
+``` javascript
    window.menu.add("View new stuff", {
       "exec": function () {
          showNewStuff();
@@ -32,7 +32,7 @@ listing to the menu:
          return true;
       }
    });
-{% endhighlight %}
+```
 So that is a lot of stuff.  The command to add to the menu (object lives at 
 `window.menu`) is the `add` method.  This takes two arguments, the first is the 
 label of the new entry, in the example it is "View new stuff".  The second argument
@@ -66,11 +66,11 @@ because these are the items that can take focus, allowing for the keyboard to ha
 working with them.  All of the anchors must also have a defined `href` attribute,
 for now I have been using `javascript:;` but I may replace this with actual state
 URLs and utilize the History API.
-{% highlight html %}
+``` html
    <div>Show Leaders</div> <!-- I will not take :focus -->
    <a>Show Quests</a> <!-- I won't take focus either -->
    <a href="javascript:;">Show Classes</a> <!-- I will take focus -->
-{% endhighlight %}
+```
 
 ## Forms
 
@@ -86,26 +86,26 @@ To define how the data is being sent, you define the `action` attribute of the
 function `window.rpg.class.action` will be called with the key-value object as its
 first argument and an object describing 'error' and 'success' callbacks.  If it is
 a URL, the object will be passed into a `jQuery.ajax` call.  Now a quick example:
-{% highlight html %}
+``` html
    <form action="javascript:rpg.user.login;">
       <input type="text" name="username">
       <input type="password" name="password">
       <input type="submit" value="Login"> <!-- having a submit allows <Enter> to work -->
    </form>
-{% endhighlight %}
+```
 Note: having the `submit` input in the form enables the hit enter to submit behavior.
 This will (on submission) send the { "username", "password" } object to the 
 `rpg.user.login` function (no more code needed).  In order to handle the outcome of
 that submission call, you will listen to the 'success' and 'error' events on the
 <form> element.  These both are given an additional argument that is the result of
 either outcome:
-{% highlight javascript %}
+``` javascript
    loginWindow.bind('success', function (evt, userData) {
       // Login successful
    }).bind('error', function (evt, errorMessage) {
       loginWindow.find(".message").text("Login failed: " + errorMessage);
    });
-{% endhighlight %}
+```
 
 ## Styling
 
@@ -114,15 +114,15 @@ to CSS).  LESS doesn't require any watcher or compiler before you view it in you
 browser, there is a JS file that is loaded in the index that will compile the LESS
 code in the window whenever you refresh.  To include your stylesheet in the document
 just add a line like:
-{% highlight html %}
+``` django
    {{ style('myextension') }}
-{% endhighlight %}
+```
 This will generate the appropriate <link> tag for either the less based one or, when
 deployed, the static CSS URL.  In your LESS stylesheet, you can include the 
 colorscheme file with:
-{% highlight less %}
+``` less
 @import ".colors.less";
-{% endhighlight %}
+```
 This adds a number of variables that define universal colors, there is @fg which is
 the default foreground color and @bg which is the default background color.  Check
 out the other included colors (or add your own).  You can then use the LESS 
