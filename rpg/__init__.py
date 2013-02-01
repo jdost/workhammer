@@ -72,7 +72,19 @@ map(lambda module: import_module("." + module, __name__), __all__)
 @app.context_processor
 def template_funcs():
     from flask import url_for
+    from jinja2 import Markup
 
     def static(filename):
         return url_for('static', filename=filename)
-    return dict(static=static)
+
+    def style(stylename):
+        if app.debug:
+            filename = "less/{}.less".format(stylename)
+            styletype = "stylesheet/less"
+        else:
+            filename = "css/{}.css".format(stylename)
+            styletype = "stylesheet"
+
+        return Markup("<link rel=\"{}\" type=\"text/css\" href=\"{}\">".format(
+            styletype, static(filename)))
+    return dict(static=static, style=style)
