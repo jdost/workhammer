@@ -7,9 +7,9 @@ to fit into the Javascript framework.
 
 The js files are all set to load in the `rpg/templates/index.html` file.  Just place
 your file below the other <script> tags like:
-```django
+
 <script type="text/javascript" src="{{ static('js/myextension.js') }}"></script>
-```
+
 Where `myextension.js` is your js file.  The `static` function in the templates is
 useful for changing the static file location.  On development, the python app will
 serve the local files, but deployed, the files can live on any server (like AWS) and
