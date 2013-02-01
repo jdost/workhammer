@@ -31,6 +31,7 @@
         success: function () {
           loggedIn = false;
           user = false;
+          window.app.loggedOut();
         }
       });
     },
