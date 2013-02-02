@@ -66,8 +66,8 @@
     var loginWindow = lib.window("login");
 
     loginWindow.append(templates.loginForm())
-      .bind('success', function (evt, data) { handleLogin(data); })
-      .bind('error', function (evt, msg) {
+      .on('success', function (evt, data) { handleLogin(data); })
+      .on('error', function (evt, msg) {
         win.find(".message").text(msg.responseText);
       })
       .children("#register").click(showRegister);
@@ -81,16 +81,16 @@
     var regWindow = lib.window("register");
 
     regWindow.append(templates.registerForm())
-      .bind('success', function (evt, data) {
+      .on('success', function (evt, data) {
         rpg.user.get({
           success: handleLogin
         });
       })
-      .bind('error', function (evt, msg) {
+      .on('error', function (evt, msg) {
         win.find(".message").text(msg.responseText);
       });
 
-    regWindow.find("form").bind("submit", function (evt) {
+    regWindow.find("form").on("submit", function (evt) {
       var self = $(evt.target);
       var pws = self.find(":password");
 

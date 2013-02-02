@@ -17,41 +17,42 @@
     events triggered on either result from the AJAX.
    **/
   exports.window = function (classes) {
-    var win = exports.el("div");
-    win.addClass("window").addClass(classes);
-    win.bind("submit", function (evt) {
-      var data = exports.getForm(event.target),
-        form = $(event.target);
+    var win = exports.el("div")
+      .addClass("window")
+      .addClass(classes)
+      .on("submit", function (evt) {
+        var data = exports.getForm(event.target),
+          form = $(event.target);
 
-      if (form.attr("action").indexOf("javascript:") !== -1) {
-        var action = form.attr("action"),
-          func = window;
+        if (form.attr("action").indexOf("javascript:") !== -1) {
+          var action = form.attr("action"),
+            func = window;
 
-        action = action.substring(11, action.indexOf(";")).split(".");
+          action = action.substring(11, action.indexOf(";")).split(".");
 
-        for (var i = 0, l = action.length; i < l; i++) {
-          func = func[action[i]];
+          for (var i = 0, l = action.length; i < l; i++) {
+            func = func[action[i]];
+          }
+
+          func(data, {
+            success: function (data) { form.trigger('success', data); },
+            error: function (data) { form.trigger('error', data); }
+          });
+        } else {
+          var url = form.attr("action");
+          jQuery.ajax({
+            url: url,
+            data: form.attr("enctype") === "application/json" ?
+                JSON.stringify(data) : data,
+            method: form.attr("method"),
+            contentType: form.attr("enctype") || "application/x-www-form-urlencoded",
+            success: function (data) { form.trigger('success', data); },
+            error: function (data) { form.trigger('error', data); }
+          });
         }
 
-        func(data, {
-          success: function (data) { form.trigger('success', data); },
-          error: function (data) { form.trigger('error', data); }
-        });
-      } else {
-        var url = form.attr("action");
-        jQuery.ajax({
-          url: url,
-          data: form.attr("enctype") === "application/json" ?
-              JSON.stringify(data) : data,
-          method: form.attr("method"),
-          contentType: form.attr("enctype") || "application/x-www-form-urlencoded",
-          success: function (data) { form.trigger('success', data); },
-          error: function (data) { form.trigger('error', data); }
-        });
-      }
-
-      return false;
-    });
+        return false;
+      });
 
     var container = exports.el("div")
         .addClass("container");

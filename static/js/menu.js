@@ -20,7 +20,7 @@
       if (!obj.show()) { return; }
       lib.el("a")
         .attr("href", "javascript:;")
-        .bind("click", function (evt) {
+        .on("click", function (evt) {
           if (!obj.exec()) { exports.close(); }
         }).text(label)
         .appendTo(win);

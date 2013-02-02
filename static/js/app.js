@@ -6,7 +6,7 @@
     rpg = window.rpg;
     starterText = $(document.body).find("#start");
 
-    $(document.body).bind("keydown", function (evt) {
+    $(document.body).on("keydown", function (evt) {
       if (evt.which === 27) { // Esc
         if (starterText) {
           starterText.hide();

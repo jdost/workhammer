@@ -39,8 +39,8 @@
     win.append(templates.builder());
 
     win.render()
-      .bind("success", showPlayer)
-      .bind("success", win.remove);
+      .on("success", showPlayer)
+      .on("success", win.remove);
   };
 
   var showPlayer = exports.showPlayer = function () {
