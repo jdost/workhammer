@@ -4,13 +4,13 @@
 
   function setup() {
     rpg = window.rpg;
-    starterText = $(document.body).find("#start");
+    start = $(document.body).find("#start");
 
     $(document.body).on("keydown", function (evt) {
       if (evt.which === 27) { // Esc
-        if (starterText) {
-          starterText.hide();
-          starterText = false;
+        if (start) {
+          start.hide();
+          start = false;
         }
         window.menu.toggle();
       } else if (evt.which === 40 || evt.which === 38) { // Arrows
@@ -39,7 +39,7 @@
 
   window.app.loggedOut = function () {
     $(".container").remove();
-    starterText = $(document.body).find("#start");
-    starterText.show();
+    start = $(document.body).find("#start");
+    start.show();
   };
 }());
