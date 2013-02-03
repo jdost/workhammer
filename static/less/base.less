@@ -2,7 +2,7 @@
 
 body {
   padding: 0;
-  margin: 8em 0 0;
+  margin: 0;
   background: @bg;
   font-family: 'Press Start 2P', sans-serif;
 
@@ -19,16 +19,19 @@ a {
 .container {
   position: absolute;
   width: 100%;
+  height: 100%;
 }
 
-.window {
-  margin: 1em auto;
-  border: 0.25em solid @blue;
-  border-radius: 0.5em;
-  padding: 1em;
-  color: @fg;
-  background: @bg;
-}
+  .window {
+    top: 50%;
+    position: relative;
+    margin: 0 auto;
+    border: 0.25em solid @blue;
+    border-radius: 0.5em;
+    padding: 1em;
+    color: @fg;
+    background: @bg;
+  }
 
 input[type="text"],
 input[type="password"] {

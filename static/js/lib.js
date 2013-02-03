@@ -60,10 +60,15 @@
       container.append(win);
       $(document.body).append(uncontained ? win : container);
       win.find(":input, a").first().focus();
+      win.center();
       return win;
     };
     win.close = function () {
       container.remove();
+    };
+    win.center = function () {
+      win.css('margin-top', '-' + (win.outerHeight(true)/2).toString() + 'px');
+      return win;
     };
 
     return win;
