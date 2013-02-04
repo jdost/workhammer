@@ -62,7 +62,7 @@
   };
 
   var showLogin = function () {
-    if (win) { win.remove(); } // Remove the login window
+    if (win) { win.close(); } // Remove the login window
     var loginWindow = lib.window("login");
 
     loginWindow.append(templates.loginForm())
@@ -77,7 +77,7 @@
   };
 
   var showRegister = function () {
-    if (win) { win.remove(); } // Remove the login window
+    if (win) { win.close(); } // Remove the login window
     var regWindow = lib.window("register");
 
     regWindow.append(templates.registerForm())
@@ -109,6 +109,6 @@
     loggedIn = true;
     buildUser(_.isArray(data) ? data[0] : data);
     app.loggedIn();
-    win.remove();
+    win.close();
   };
 }(window.user = {}));
