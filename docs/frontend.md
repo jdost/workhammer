@@ -6,10 +6,10 @@ to fit into the Javascript framework.
 ## Loading your file
 
 The js files are all set to load in the `rpg/templates/index.html` file.  Just place
-your file below the other <script> tags like:
-
+your file below the other `<script>` tags like:
+```jinja
 <script type="text/javascript" src="{{ static('js/myextension.js') }}"></script>
-
+```
 Where `myextension.js` is your js file.  The `static` function in the templates is
 useful for changing the static file location.  On development, the python app will
 serve the local files, but deployed, the files can live on any server (like AWS) and
@@ -18,7 +18,7 @@ this function will then deliver that URL instead.
 ## Adding to the application
 
 Probably the first thing you will want to do for your application is adding an entry
-to the menu, this is the window that pops up whenever you hit <Esc>.  This is the
+to the menu, this is the window that pops up whenever you hit `<Esc>`.  This is the
 overall system to getting to different areas of the application (if you want to
 modify an existing window, you will need to edit the existing file).  To add a
 listing to the menu:
@@ -67,7 +67,7 @@ working with them.  All of the anchors must also have a defined `href` attribute
 for now I have been using `javascript:;` but I may replace this with actual state
 URLs and utilize the History API.
 ```html
-<div>Show Leaders</div> <!-- I will not take :focus -->
+<div>Show Leaders</div> <!-- I will not take focus -->
 <a>Show Quests</a> <!-- I won't take focus either -->
 <a href="javascript:;">Show Classes</a> <!-- I will take focus -->
 ```
@@ -82,7 +82,7 @@ the backend as the name of the input.  If the name begins with a '.' it is ignor
 If you want to validate the form before sending it, you can attach a `submit`
 listener on the form element and stop the propagation of the event if it fails.
 To define how the data is being sent, you define the `action` attribute of the 
-<form> element.  If this is of the form `javascript:<rpg.class.action>;`, the public
+`<form>` element.  If this is of the form `javascript:<rpg.class.action>;`, the public
 function `window.rpg.class.action` will be called with the key-value object as its
 first argument and an object describing 'error' and 'success' callbacks.  If it is
 a URL, the object will be passed into a `jQuery.ajax` call.  Now a quick example:
@@ -97,7 +97,7 @@ Note: having the `submit` input in the form enables the hit enter to submit beha
 This will (on submission) send the { "username", "password" } object to the 
 `rpg.user.login` function (no more code needed).  In order to handle the outcome of
 that submission call, you will listen to the 'success' and 'error' events on the
-<form> element.  These both are given an additional argument that is the result of
+`<form>` element.  These both are given an additional argument that is the result of
 either outcome:
 ```javascript
 loginWindow.bind('success', function (evt, userData) {
@@ -117,7 +117,7 @@ just add a line like:
 ```django
 {{ style('myextension') }}
 ```
-This will generate the appropriate <link> tag for either the less based one or, when
+This will generate the appropriate `<link>` tag for either the less based one or, when
 deployed, the static CSS URL.  In your LESS stylesheet, you can include the 
 colorscheme file with:
 ```less
