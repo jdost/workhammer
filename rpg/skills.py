@@ -8,7 +8,7 @@ from . import app, filter_keys, calc_level
 from . import roles, logger, settings
 from .decorators import datatype, require_permissions
 from .classes import update_class
-from .database import Skill, errors
+from .database import Skill, Player, errors
 import httplib
 # Keys that the user cannot directly changed (controlled by the app)
 reserved_keys = ["created", "created_by", "modified", "modified_by"]
@@ -93,7 +93,25 @@ def modify_skill(skill_id):
     return redirect(url_for('get_skill', skill_id=skill_id)) \
         if request.is_html else (skill_info, httplib.ACCEPTED)
 
-# /skill/<skill_id>/leaders -> get list of leaders for the skill
+
+@app.route("/skill/<skill_id>/leaders", methods=["GET"])
+@datatype
+def get_skill_leaders(skill_id):
+    ''' get_skill_leaders -> GET /skill/<skill_id>/leaders
+        GET: limit=<int>(optional)
+    Retrieves the leader list for the skill specified by the <skill_id>
+    parameter, will limit the result to the number specified by the limit GET
+    param or 10 (default).
+    '''
+    limit = int(request.form.get("limit", "10"))
+
+    try:
+        players = Player.leaders(skill=skill_id, limit=limit)
+    except errors.NoEntryError as err:
+        logger.info(err)
+        return "The given ID was not found for the Skill.", httplib.NOT_FOUND
+
+    return players
 
 
 def base_skill():

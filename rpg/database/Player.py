@@ -2,21 +2,31 @@ from flask import url_for
 from datetime import datetime
 from . import collection, has_keys, ObjectId, convert_id
 from . import errors
+from pymongo import DESCENDING
 database = collection("players")
 
 player_keys = ["name"]
 
 
-def __simple(packet):
+def __simple(packet, key=None):
     ''' __simple
     Returns the simple version of the Player document
     '''
-    return {
+    doc = {
         "name": packet["name"],
         "id": str(packet["_id"]),
         "age": str(datetime.utcnow() - packet["created"]),
         "url": url_for('get_player', player_id=str(packet["_id"]))
     }
+
+    if key:
+        keys = key.split(".")
+        pkt = packet
+        for k in keys:
+            pkt = pkt[k]
+        doc[key] = pkt
+
+    return doc
 
 
 def __complex(packet):
@@ -81,6 +91,27 @@ def all():
     <list> of them.
     '''
     return [__simple(player) for player in database.find()]
+
+
+def leaders(skill=None, cls=None, limit=10):
+    ''' Player::leaders
+    Retrieves the top <limit> players sorted by the specified class or skill
+    id, where they are defined.  Returns a <list> of them.
+    '''
+    query = {}
+    key = None
+
+    if skill:
+        key = "skills." + skill
+        query[key] = {"$exists": True}
+    elif cls:
+        key = "classes." + cls
+        query[key] = {"$exists": True}
+    else:
+        return all()
+
+    return [__simple(player, key) for player in database.find(
+        query, limit=limit, sort=[(key, DESCENDING)])]
 
 
 def modify(info, user_id):

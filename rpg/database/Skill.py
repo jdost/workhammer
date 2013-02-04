@@ -24,6 +24,7 @@ def __complex(packet):
     '''
     convert_id(packet)
     packet["url"] = url_for("get_skill", skill_id=packet["id"])
+    packet["leaders"] = url_for("get_skill_leaders", skill_id=packet["id"])
 
     return packet
 

@@ -129,3 +129,28 @@ class SkillTest(TestBase):
         self.assertHasStatus(response, httplib.ACCEPTED)
         new_skill = json.loads(response.data)
         self.assertEqual(new_skill["name"], skill["name"])
+
+    def test_leaders(self):
+        ''' Tests leader board for skills
+        Creates a skill, a quest that adds points to the skill, and then has a
+        player complete the quest.  This should then add the player to the
+        leader list of the skill.
+        '''
+        player = self.create_player(self.player)
+        skill = self.create_skill(self.skill)
+        quest = self.quest.copy()
+        quest["rewards"]["skills"] = {
+            skill["id"]: 15
+        }
+        quest = self.create_quest(quest)
+
+        response = self.app.post(quest["url"],
+                                 data={"player_id": player['id'], "status": 0},
+                                 headers=self.json_header)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+
+        response = self.app.get(skill["leaders"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1, "Leader board is incorrect size.")
