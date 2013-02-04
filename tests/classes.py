@@ -175,6 +175,11 @@ class ClassTest(TestBase):
         }
         cls = self.create_class(cls)
 
+        response = self.app.get(cls["leaders"], headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        data = json.loads(response.data)
+        self.assertEmpty(data)
+
         player = self.create_player(self.player)
         response = self.app.post(quest["url"],
                                  data={"player_id": player["id"], "status": 0},
