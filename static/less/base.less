@@ -56,3 +56,18 @@ input[type="submit"] {
     cursor: pointer;
   }
 }
+
+.window {
+  a {
+    display: block;
+    &:before {
+      content: ">";
+      visibility: hidden;
+    }
+
+    &:hover, &:focus {
+      cursor: pointer;
+      &:before { visibility: visible; }
+    }
+  }
+}

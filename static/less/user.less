@@ -6,17 +6,5 @@
     display: block;
   }
 
-  a {
-    display: block;
-    margin: 1em;
-    &:before {
-      content: ">";
-      visibility: hidden;
-    }
-    &:hover,
-    &:focus {
-      cursor: pointer;
-      &:before { visibility: visible; }
-    }
-  }
+  a { margin: 1em; }
 }
