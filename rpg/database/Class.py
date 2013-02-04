@@ -23,6 +23,7 @@ def __complex(packet):
     '''
     convert_id(packet)
     packet["url"] = url_for("get_class", class_id=packet["id"])
+    packet["leaders"] = url_for("get_class_leaders", class_id=packet["id"])
 
     return packet
 

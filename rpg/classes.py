@@ -9,7 +9,7 @@ from flask import session, request, redirect, url_for
 from . import app, filter_keys, calc_level
 from . import roles, logger
 from .decorators import datatype, require_permissions
-from .database import Class, errors
+from .database import Class, Player, errors
 import httplib
 # Keys that the user cannot directly change (controlled by the app)
 reserved_keys = ["created", "created_by", "modified", "modified_by"]
@@ -91,7 +91,25 @@ def modify_class(class_id):
     return redirect(url_for('get_class', class_id=class_id)) \
         if request.is_html else (class_info, httplib.ACCEPTED)
 
-# /class/<class_id>/leaders GET
+
+@app.route("/class/<class_id>/leaders", methods=["GET"])
+@datatype
+def get_class_leaders(class_id):
+    ''' get_class_leaders -> GET /class/<class_id>/leaders
+        GET: limit=<int>(optional)
+    Retrieves the leader list for the class specified by the <class_id>
+    parameter, will limit the result to the number specified by the limit GET
+    param or 10 (default).
+    '''
+    limit = int(request.form.get("limit", "10"))
+
+    try:
+        players = Player.leaders(cls=class_id, limit=limit)
+    except errors.NoEntryError as err:
+        logger.info(err)
+        return "The given ID was not found for the Class.", httplib.NOT_FOUND
+
+    return players
 
 
 def base_class():
