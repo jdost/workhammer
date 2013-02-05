@@ -79,7 +79,9 @@
   /** lib.getForm
     Helper function that takes a form and generates a hash table with the `name` -
     `value` pairs of the form's inputs.  Ignores all submit inputs and any names
-    that begin with a `.`
+    that begin with a `.` or have no name.  If names have `.` in them, treats them
+    as a hierarchical representation and will create the proper object structure
+    above them.  So `foo.bar.baz` will make {'foo': {'bar': {'baz': <value>}}}.
    **/
   exports.getForm = function (form) {
     var data = {};
@@ -99,7 +101,6 @@
         key = keys[i];
       }
       field[key] = input.val();
-      //data[input.attr("name")] = input.val();
     });;
 
     return data;
