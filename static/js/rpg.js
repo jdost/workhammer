@@ -380,7 +380,7 @@ window.rpg = (function (lib) {
   lib.skill.get = function (skill, cb) {
     if (!ready) { return queue.push(function () { lib.skill.get(skill, cb); }); }
 
-    var url = getURL(skill, routes.skill.url);
+    var url = getURL(skill, routes.skills.url);
     if (typeof skill === 'object' && (skill.success || skill.error)) {
       cb = skill;
     }
