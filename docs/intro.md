@@ -13,6 +13,8 @@ functionality.
 1. [Skills](skills.md)
 1. [Classes](classes.md)
 1. [Usage](usage.md)
+1. [Frontend Development](frontend.md)
+1. [Future Ideas](ideas.md)
 
 ## Terminology
 * **Player**: The 'game' unit, this is the alter ego that plays the game, their are
@@ -31,4 +33,4 @@ the DMs and performed by the players.
 rewards from other quests when equipped.
 * **Class**: This will be attached to skill areas in the real world, things that
 pertain to various specialities and will affect the rewards from quests.
-* *Skill*: Attributes/stats for the player, these are changed via quests
+* **Skill**: Attributes/stats for the player, these are changed via quests

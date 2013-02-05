@@ -30,3 +30,28 @@ level it up, granting 15 XP to the Player (main class?).  This will probably be
 configurable for each Skill (so levelling up testing could give 20 XP versus
 levelling up burns could only give 5 XP -- this would allow for joke skills that
 don't actually affect the actual player beyond being there, like 'build breaking').
+The formula will be a string that describes a function describing the overall SP for
+each level, so `100*n` would mean that level 1 requires 100 SP (`100*1`) and level
+2 requires 200 SP (`100*2`).  This allows for a pretty varied growth like 
+`10*n+90` which would put the levels at 100, 110, 120, etc.
+
+NOTE: once a skill has leveled, if you change the formula, it will not retroactively
+go back and reset the skill level.  Eventually there will be functionality to reset
+a player's stats and then run through their quest log and rebuild their levels.
+
+## Leaders
+
+There is a leaders URL provided in the full Skill response packet.  Calling this
+as is (meaning you just use the URL with a GET) will return (up to) the top 10
+leaders (if no one has leveled the skill, it will return an empty array).  If you
+set the GET param of `limit` to something else, it will override the default of 
+`10`.
+
+## Data Structure
+
+Skills are only listed for a player when there is **some** experience in it.  This
+is so that whenever a skill is created, it doesn't need to be added to every player
+structure and clutter up the data model.  In the full player description, there
+is a key value set of skill IDs and the description of that skill's statistics for
+the player.  This is to decrease packet sizes, you should grab the simple skill list
+and use the ID to look up the skill.
