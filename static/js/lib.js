@@ -24,6 +24,9 @@
         var data = exports.getForm(event.target),
           form = $(event.target);
 
+        // Don't do anything if no action is defined
+        if (!form.attr("action")) { return false; }
+
         if (form.attr("action").indexOf("javascript:") !== -1) {
           var action = form.attr("action"),
             func = window;
@@ -85,8 +88,18 @@
     _.each(inputs, function (input) {
       input = jQuery(input);
       if (input.attr("type") === "submit") { return; }
+      if (!input.attr("name")) { return; }
       if (input.attr("name")[0] === ".") { return; }
-      data[input.attr("name")] = input.val();
+      var field = data, keys = input.attr("name").split("."), key;
+      for (var i = 0, l = keys.length; i < l; i++) {
+        if (key) {
+          field[key] = {};
+          field = field[key];
+        }
+        key = keys[i];
+      }
+      field[key] = input.val();
+      //data[input.attr("name")] = input.val();
     });;
 
     return data;
