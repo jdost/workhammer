@@ -43,7 +43,8 @@ input[type="password"] {
   outline: none;
   width: 100%;
 }
-input[type="submit"] {
+input[type="submit"],
+input[type="button"] {
   border: solid 0.2em @blue;
   background: @bg;
   padding: 0.33em;
@@ -54,6 +55,16 @@ input[type="submit"] {
     background: @blue;
     color: @bg;
     cursor: pointer;
+  }
+}
+textarea {
+  width: 100%;
+  border: solid 0.1em @fg;
+  color: @fg;
+  background: @bg;
+  outline: none;
+  &:focus {
+    background: lighten(@bg, 5%);
   }
 }
 
