@@ -280,6 +280,36 @@ window.rpg = (function (lib) {
       }
     });
   };
+  /** player.modify
+      args: player - (player object) original player object for the player being
+              modified
+            details - (hash table) describes the new properties of the player, must
+              include the 'url' property of an existing player
+
+    Takes the hash table and tries to send it to the backend as a modification set
+    on the player passed in.
+   **/
+  lib.player.modify = function (player, details, cb) {
+    if (typeof player !== 'object') { return false; }
+    if (typeof details !== 'object') { return false; }
+
+    cb = cb || {};
+    var url = getURL(player, false);
+    if (!url) { return false; }
+
+    return ajax({
+      url: url,
+      type: 'PUT',
+      contentType: 'application/json',
+      data: details,
+      success: function (data) {
+        if (typeof cb.success === 'function') { cb.success(data); }
+      },
+      error: function (msg) {
+        if (typeof cb.error === 'function') { cb.error(msg); }
+      }
+    });
+  };
   /** player.complete
       args: player - (player object) player object for the player completing quest
             quest - (quest object) quest object returned from app, one to complete
@@ -391,6 +421,31 @@ window.rpg = (function (lib) {
       'GET',
       cb);
   };
+  /** skill.leaders
+      args: skill - (skill object) skill object returned from app
+            (optional) limit - how many leaders to get
+
+    Retrieves the list of leaders for the provided skill, if the limit argument is
+    provided, it will change from the default of 10.
+   **/
+  lib.skill.leaders = function (skill, limit, cb) {
+    if (typeof skill !== 'object') { return false; }
+    cb = cb || {};
+    var params = '';
+
+    var url = skill.leaders;
+    if (typeof limit === 'object') {
+      cb = limit;
+    } else {
+      params = { 'limit': limit };
+    }
+
+    return generic(
+      url,
+      params,
+      'GET',
+      cb);
+  };
   /** skill.create
       args: skill - (hash table) describes the various properties of the skill to
               create
@@ -464,6 +519,36 @@ window.rpg = (function (lib) {
       }
     });
   };
+  // }}}
+  // utils {{{
+  lib.utils = {};
+  /** utils.runFormula
+      args: formula - (string) formula to get level+experience for
+            min (optional) - (integer) level to start evaluating for
+            max (optional) - (integer) level to evaluate up to
+
+      Goes from the `min` level to `max` level and calculates the required
+      experience for each level (useful for displaying progress stages).  Returns a
+      hash table with the keys being each level and the values the required
+      experience.
+   **/
+  lib.utils.runFormula = function (formula, min, max) {
+    if (!max) {
+      max = min || 5;
+      min = 1;
+    }
+    // Strip all chars except `n` (hopefully makes formula safe)
+    formula = formula.replace(/[A-Za-mo-z\[\]]+/g, "");
+    var vals = {};
+    for (var i = min; i <= max; i++) {
+      vals[i] = eval("n=" + i + ";" + formula + ";");
+    }
+
+    return vals;
+  };
+  /** utils.ajax
+   **/
+  lib.utils.ajax = ajax;
   // }}}
 
   ajax({ // Has to request the endpoints from the API server
