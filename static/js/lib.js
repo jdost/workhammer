@@ -21,8 +21,8 @@
       .addClass("window")
       .addClass(classes)
       .on("submit", function (evt) {
-        var data = exports.getForm(event.target),
-          form = $(event.target);
+        var data = exports.getForm(evt.target),
+          form = $(evt.target);
 
         // Don't do anything if no action is defined
         if (!form.attr("action")) { return false; }
@@ -54,6 +54,8 @@
           });
         }
 
+        evt.stopPropagation();
+        evt.preventDefault();
         return false;
       });
 
