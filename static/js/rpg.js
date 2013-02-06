@@ -47,9 +47,10 @@ window.rpg = (function (lib) {
       if (xhr.readyState !== xhr.DONE) { return; }
       if (xhr.status >= 300) {  // Only error on status codes > 2xx
         if (!args.statusCode[xhr.status]) {
-          return args.error ? args.error(xhr.responseText) : "";
+          if (xhr.status < 400) { return; }  // Don't call `error` if a redirect
+          return args.error ? args.error(xhr.responseText, xhr) : "";
         } else {
-          return args.statusCode[xhr.status](xhr.responseText);
+          return args.statusCode[xhr.status](xhr.responseText, xhr);
         }
       }
 
@@ -92,6 +93,9 @@ window.rpg = (function (lib) {
       options.url = prefix + options.url;
       options.dataType = 'json';
       options.accepts = "application/json";
+
+      var err = options.error;
+      options.error = function (xhr) { err(xhr.responseText, xhr); };
     });
   }
 
@@ -105,8 +109,8 @@ window.rpg = (function (lib) {
       success: function (data) {
         if (typeof cb.success === 'function') { cb.success(data); }
       },
-      error: function (data) {
-        if (typeof cb.error === 'function') { cb.error(data); }
+      error: function (data, xhr) {
+        if (typeof cb.error === 'function') { cb.error(data, xhr); }
       }
     });
   };
@@ -237,6 +241,11 @@ window.rpg = (function (lib) {
     var url = getURL(player, routes.players.url);
     if (player.success || player.error) {
       cb = player;
+      temp = player.success;
+
+      cb.success = function (data) {
+        temp ? temp(lib.utils.convertArray(data)) : "";
+      };
     }
 
     return generic(
@@ -275,8 +284,8 @@ window.rpg = (function (lib) {
       success: function (data) {
         if (typeof cb.success === 'function') { cb.success(data); }
       },
-      error: function (msg) {
-        if (typeof cb.error === 'function') { cb.error(msg); }
+      error: function (msg, xhr) {
+        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
       }
     });
   };
@@ -305,8 +314,8 @@ window.rpg = (function (lib) {
       success: function (data) {
         if (typeof cb.success === 'function') { cb.success(data); }
       },
-      error: function (msg) {
-        if (typeof cb.error === 'function') { cb.error(msg); }
+      error: function (msg, xhr) {
+        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
       }
     });
   };
@@ -345,6 +354,11 @@ window.rpg = (function (lib) {
     var url = getURL(quest, routes.quest.url);
     if (typeof quest === 'object' && (quest.success || quest.error)) {
       cb = quest;
+      temp = quest.success;
+
+      cb.success = function (data) {
+        temp ? temp(lib.utils.convertArray(data)) : "";
+      };
     }
 
     return generic(
@@ -372,8 +386,8 @@ window.rpg = (function (lib) {
       success: function (data) {
         if (typeof cb.success === 'function') { cb.success(data); }
       },
-      error: function (msg) {
-        if (typeof cb.error === 'function') { cb.error(msg); }
+      error: function (msg, xhr) {
+        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
       }
     });
   };
@@ -413,6 +427,11 @@ window.rpg = (function (lib) {
     var url = getURL(skill, routes.skills.url);
     if (typeof skill === 'object' && (skill.success || skill.error)) {
       cb = skill;
+      temp = skill.success;
+
+      cb.success = function (data) {
+        temp ? temp(lib.utils.convertArray(data)) : "";
+      };
     }
 
     return generic(
@@ -465,8 +484,8 @@ window.rpg = (function (lib) {
       success: function (data) {
         if (typeof cb.success === 'function') { cb.success(data); }
       },
-      error: function (msg) {
-        if (typeof cb.error === 'function') { cb.error(msg); }
+      error: function (msg, xhr) {
+        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
       }
     });
   };
@@ -487,6 +506,11 @@ window.rpg = (function (lib) {
     var url = getURL(cls, classes.routes.url);
     if (typeof cls === 'object' && (cls.success || cls.error)) {
       cb = cls;
+      cb.success = function (data_) {
+        if (!cls.success) { return; }
+
+        cls.success(data);
+      };
     }
 
     return generic(
@@ -514,8 +538,8 @@ window.rpg = (function (lib) {
       success: function (data) {
         if (typeof cb.success === 'function') { cb.success(data); }
       },
-      error: function (msg) {
-        if (typeof cb.error === 'function') { cb.error(msg); }
+      error: function (msg, xhr) {
+        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
       }
     });
   };
@@ -547,8 +571,31 @@ window.rpg = (function (lib) {
     return vals;
   };
   /** utils.ajax
+    Wrapper for the ajax calls, just providing it for general usage, it takes and
+    acts mostly the same as the jQuery ajax call, check the source for differences.
    **/
   lib.utils.ajax = ajax;
+  /** utils.convertArray
+      args: array - (Array) array of data to convert into hash table
+            key (optional) - (string) key of objects to use for keys in table,
+              defaults to 'id'
+
+    Will convert the array of objects into a hash table, uses the key param as the
+    key to use for the hash table key (defaults to 'id').
+
+    > convertArray([{'foo': 'bar'}, {'foo': 'baz'}], "foo")
+    {'bar': {'foo': 'bar'}, 'baz': {'foo': 'baz'}}
+   **/
+  lib.utils.convertArray = function (array, key) {
+    var data = {};
+    key = key || "id";
+
+    for (var i = 0, l = array.length; i < l; i++) {
+      data[array[i][key]] = array[i];
+    }
+
+    return data;
+  };
   // }}}
 
   ajax({ // Has to request the endpoints from the API server

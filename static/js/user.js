@@ -67,9 +67,7 @@
 
     loginWindow.append(templates.loginForm())
       .on('success', function (evt, data) { handleLogin(data); })
-      .on('error', function (evt, msg) {
-        win.find(".message").text(msg.responseText);
-      })
+      .on('error', function (evt, msg) { win.find(".message").text(msg); })
       .children("#register").click(showRegister);
 
     loginWindow.render();
@@ -86,9 +84,7 @@
           success: handleLogin
         });
       })
-      .on('error', function (evt, msg) {
-        win.find(".message").text(msg.responseText);
-      });
+      .on('error', function (evt, msg) { win.find(".message").text(msg); });
 
     regWindow.find("form").on("submit", function (evt) {
       var self = $(evt.target);
