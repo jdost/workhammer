@@ -1,3 +1,4 @@
+from flask import url_for
 from datetime import datetime
 from . import collection, ObjectId, convert_id
 from . import errors
@@ -21,7 +22,10 @@ def __private_user(packet):
     private_packet["role"] = map(lambda k: roles_lookup.get(k), packet["role"])
 
     if "player" in private_packet:
-        private_packet["player"] = str(private_packet["player"])
+        private_packet["player"] = {
+            "url": url_for('get_player', player_id=str(packet["player"])),
+            "id": str(packet["player"])
+        }
 
     return private_packet
 
@@ -36,7 +40,10 @@ def __public_user(packet):
         "role": map(lambda k: roles_lookup.get(k), packet["role"])
     }
     if "player" in packet:
-        public_packet["player"] = str(packet["player"])
+        public_packet["player"] = {
+            "url": url_for('get_player', player_id=str(packet["player"])),
+            "id": str(packet["player"])
+        }
 
     return public_packet
 

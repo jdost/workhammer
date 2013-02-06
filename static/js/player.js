@@ -43,12 +43,14 @@
       .on("success", win.remove);
   };
 
-  var showPlayer = exports.showPlayer = function () {
+  var showPlayer = exports.showPlayer = function (player) {
     var win = lib.window("player viewer");
 
-    rpg.player.get({
+    if (!player) { player = window.user.getUser().player; }
+
+    rpg.player.get(player, {
       success: function (player) {
-        win.append(templates.viewer(player[0]));
+        win.append(templates.viewer(player));
       }
     });
 
