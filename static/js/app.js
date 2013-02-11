@@ -14,7 +14,7 @@
         }
         window.menu.toggle();
       } else if (evt.which === 40 || evt.which === 38) { // Arrows
-        var els = $(".window").last().find("a, :input");
+        var els = $(".window").last().find("a, :input, select");
         var id = els.index($(":focus").first()) + (evt.which === 40 ? 1 : -1);
         if (id < 0) { id = els.length-1; }
         else if (id >= els.length) { id = 0; }
