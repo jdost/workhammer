@@ -19,10 +19,13 @@
   }
 }
 @-webkit-keyframes blink {
-  from { opacity: 1.0; }
-  to { opacity: 0.0; }
+  from { color: @fg; }
+  to { color: @bg; }
 }
 #start {
+  background: url(../bin/logo.png) no-repeat top center;
+  margin-top: 100px;
+  padding: 260px;
   text-align: center;
   color: @fg;
 
