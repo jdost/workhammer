@@ -47,7 +47,8 @@ input[type="password"] {
   }
 }
 input[type="submit"],
-input[type="button"] {
+input[type="button"],
+button[type="button"] {
   border: solid 0.2em @blue;
   background: @bg;
   padding: 0.33em;
@@ -85,6 +86,23 @@ select {
   option {
     background: @bg;
     color: @fg;
+  }
+}
+progress {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: @fg;
+
+  &::-webkit-progress-bar {
+    background: @fg;
+  }
+
+  &::-webkit-progress-bar-value,
+  &::-webkit-progress-value,
+  &::-moz-progress-bar {
+    background: @blue;
+    color: @blue;
   }
 }
 
