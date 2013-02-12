@@ -47,10 +47,71 @@
     "rewardList": lib.template(function () {/*
       <div class="reward">{{ name }} +{{ reward }} SP</div>
       <input type="hidden" name="rewards.skills.{{ id }}" value="{{ reward }}" />
+      */}),
+    "list": lib.template(function () {/*
+      <% _.each(quests, function (quest, index) { %>
+        <a href="{{ quest.url }}">{{ quest.name }}</a>
+      <% }); %>
+      */}),
+    "read": lib.template(function () {/*
+      <h1>{{ name }}</h1>
+      <div>{{ description }}</div>
+      */}),
+    "edit": lib.template(function () {/*
+      <form action="">
+        <a href="javascript:;"><h1>{{ name }}</h1></a>
+        <input type="text" name="name" value="{{ name }}" />
+        <a href="javascript:;"><div>{{ description }}</div></a>
+        <textarea name="description">{{ description }}</textarea>
+        <input type="submit" value="Update Quest" />
+      </form>
       */})
   };
 
+  var showIndividual = function (url) {
+    var win = lib.window("quests single")
+     , render = function (quest) {
+      var user = window.user.getUser();
+
+      win.append(templates[user.roles.isDM ? "edit" : "read"](quest))
+        .render()
+        .on("submit", function (evt) {
+          rpg.quest.modify(quest, lib.getForm(evt.target), {
+            "success": function (data) { win.trigger('success', data); }
+          });
+
+          evt.stopPropagation();
+          evt.preventDefault();
+          return false;
+        });
+      };
+
+    rpg.quest.get(url, { "success": render });
+    win.on("success", function (evt, quest) {
+      win.empty();
+      render(quest);
+    });
+  };
+
   var showQuests = function () {
+    var win = lib.window("quests list");
+
+    rpg.quest.get({
+      "success": function (quests) {
+        win.append(templates.list({ "quests": quests }))
+          .focus()
+          .find("a").each(function (index, el) {
+            $(el).click(function (evt) {
+              showIndividual($(el).attr("href"));
+              evt.preventDefault();
+              evt.stopPropagation();
+              return false;
+            });
+          });
+      }
+    });
+
+    win.render();
   };
 
   var skills;
