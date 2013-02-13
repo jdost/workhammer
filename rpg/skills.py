@@ -69,6 +69,7 @@ def get_skill(skill_id):
 
 @app.route("/skill/<skill_id>", methods=["PUT"])
 @datatype
+@require_permissions(roles.ROOT, roles.ADMIN)
 def modify_skill(skill_id):
     ''' modify_skill -> PUT /skill/<skill_id>
         PUT: <JSON DATA>
