@@ -10,7 +10,7 @@
       return !user.roles.isPlayer;
     }
   })
-  .add("Edit Player", {
+  .add("View Player", {
     "exec": function () { return showPlayer(); },
     "show": function () {
       var user = window.user.getUser();
@@ -30,6 +30,17 @@
     "viewer": lib.template(function () {/*
       <h1>{{ name }}</h>
       <div></div>
+      */}),
+    "editor": lib.template(function () {/*
+      <form action="">
+      <a href="javascript:;">
+        <h1>{{ name }}</h1>
+      </a>
+      <input name="name" value="{{ name }}" />
+
+      <input type="submit" value="Update Player" />
+      <button type="cancel">Cancel</button>
+      </form>
       */})
   };
 
@@ -45,12 +56,28 @@
 
   var showPlayer = exports.showPlayer = function (player) {
     var win = lib.window("player viewer");
+    var edittable = typeof player !== object;
 
     if (!player) { player = window.user.getUser().player; }
 
     rpg.player.get(player, {
       success: function (player) {
-        win.append(templates.viewer(player));
+        win.append(templates[edittable ? "editor" : "viewer"](player))
+          .on("submit", function (evt) {
+            rpg.player.modify(player, lib.getForm(evt.target), {
+              "success": function (data) { win.trigger('success', data); }
+            });
+
+            evt.stopPropagation();
+            evt.preventDefault();
+            return false;
+          })
+          .on("click", "a", function (evt) {
+            var anchor = $(evt.target);
+            anchor.hide()
+              .next().show().focus();
+            win.find("input[type=submit]").show();
+          });
       }
     });
 
