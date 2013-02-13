@@ -57,6 +57,11 @@
         evt.stopPropagation();
         evt.preventDefault();
         return false;
+      }).on("click", "button[type=cancel]", function (evt) {
+        win.close();
+        evt.preventDefault();
+        evt.stopPropagation();
+        return false;
       });
 
     win.focus = function () {
