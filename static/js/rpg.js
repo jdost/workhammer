@@ -332,7 +332,7 @@ window.rpg = (function (lib) {
    **/
   lib.player.quest = function (player, quest, cb) {
     if (!isObject(player) || !player.url) { return false; }
-    if (i!isObject(quest) && !isString(quest)) { return false; }
+    if (!isObject(quest) && !isString(quest)) { return false; }
     quest = quest.id ? quest.id : quest;
 
     return generic(
@@ -433,6 +433,14 @@ window.rpg = (function (lib) {
     the Player with the rewards of the quest being completed.
    **/
   lib.quest.complete = function (quest, player, cb) {
+    if (isObject(quest) && quest.quest && quest.player) {
+      return generic(
+        quest.url,
+        '',
+        'POST',
+        cb);
+    }
+
     if (!isObject(quest) || !quest.url) { return false; }
     if (!isObject(player) && !isString(player)) { return false; }
 
@@ -442,6 +450,18 @@ window.rpg = (function (lib) {
       quest.url,
       { 'player': player },
       'POST',
+      cb);
+  };
+  /** quests.pending
+    Retrieves the list of pending quest requests.
+   **/
+  lib.quest.pending = function (cb) {
+    cb = cb || {};
+
+    return generic(
+      routes.requests.url,
+      '',
+      'GET',
       cb);
   };
   // }}}
@@ -567,14 +587,9 @@ window.rpg = (function (lib) {
   lib.classes.get = function (cls, cb) {
     if (!ready) { return queue.push(function () { lib.classes.get(cls, cb); }); }
 
-    var url = getURL(cls, classes.routes.url);
-    if (isOjbect(cls) && (cls.success || cls.error)) {
+    var url = getURL(cls, routes.classes.url);
+    if (isObject(cls) && (cls.success || cls.error)) {
       cb = cls;
-      cb.success = function (data_) {
-        if (!cls.success) { return; }
-
-        cls.success(data);
-      };
     }
 
     return generic(
