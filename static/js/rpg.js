@@ -124,6 +124,10 @@ window.rpg = (function (lib) {
     };
   };
 
+  function isFunction (a) { return typeof a === 'function'; };
+  function isObject (a) { return typeof a === 'object'; };
+  function isString (a) { return typeof a === 'string'; };
+
   /**  NOTE
     All of these ajax functions have an optional last argument, this is the
     callback object, the success function will be called upon success of the action
@@ -155,7 +159,7 @@ window.rpg = (function (lib) {
     var temp = cb.success;
     cb.success = function (data) {
       loggedIn = true;
-      if (typeof temp === 'function') { temp(data); }
+      if (isFunction(temp)) { temp(data); }
     };
 
     return generic(
@@ -182,7 +186,7 @@ window.rpg = (function (lib) {
     var temp = cb.success;
     cb.success = function (data) {
       loggedIn = true;
-      if (typeof temp === 'function') { temp(data); }
+      if (isFunction(temp)) { temp(data); }
     };
 
     return generic(
@@ -203,7 +207,7 @@ window.rpg = (function (lib) {
     var temp = cb.success;
     cb.success = function (data) {
       loggedIn = false;
-      if (typeof temp === 'function') { temp(data); }
+      if (isFunction(temp)) { temp(data); }
     };
 
     return generic(
@@ -264,12 +268,12 @@ window.rpg = (function (lib) {
     properties.
    **/
   lib.player.create = function (player, user, cb) {
-    if (typeof player !== 'object') { return false; }
-    if (typeof user === 'object' && user.id) {
+    if (!isObject(player)) { return false; }
+    if (isObject(user) && user.id) {
       player.user = user.id;
-    } else if (typeof user === 'string') {
+    } else if (isString(user)) {
       player.user = user;
-    } else if (typeof user === 'object' && (user.success || user.error)) {
+    } else if (isObject(user) && (user.success || user.error)) {
       cb = user;
     }
 
@@ -282,10 +286,10 @@ window.rpg = (function (lib) {
       contentType: 'application/json',
       data: player,
       success: function (data) {
-        if (typeof cb.success === 'function') { cb.success(data); }
+        if (isFunction(cb.success)) { cb.success(data); }
       },
       error: function (msg, xhr) {
-        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
+        if (isFunction(cb.error)) { cb.error(msg, xhr); }
       }
     });
   };
@@ -299,8 +303,8 @@ window.rpg = (function (lib) {
     on the player passed in.
    **/
   lib.player.modify = function (player, details, cb) {
-    if (typeof player !== 'object') { return false; }
-    if (typeof details !== 'object') { return false; }
+    if (!isObject(player)) { return false; }
+    if (!isObject(details)) { return false; }
 
     cb = cb || {};
     var url = getURL(player, false);
@@ -312,10 +316,10 @@ window.rpg = (function (lib) {
       contentType: 'application/json',
       data: details,
       success: function (data) {
-        if (typeof cb.success === 'function') { cb.success(data); }
+        if (isFunction(cb.success)) { cb.success(data); }
       },
       error: function (msg, xhr) {
-        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
+        if (isFunction(cb.error)) { cb.error(msg, xhr); }
       }
     });
   };
@@ -327,8 +331,8 @@ window.rpg = (function (lib) {
     the Player with the rewards of the quest being completed.
    **/
   lib.player.quest = function (player, quest, cb) {
-    if (typeof player !== 'object' || !player.url) { return false; }
-    if (typeof quest !== 'object' && typeof quest !== 'string') { return false; }
+    if (!isObject(player) || !player.url) { return false; }
+    if (!isObject(quest) && !isString(quest)) { return false; }
     quest = quest.id ? quest.id : quest;
 
     return generic(
@@ -351,8 +355,8 @@ window.rpg = (function (lib) {
   lib.quest.get = function (quest, cb) {
     if (!ready) { return queue.push(function () { lib.quest.get(quest, cb); }); }
 
-    var url = getURL(quest, routes.quest.url);
-    if (typeof quest === 'object' && (quest.success || quest.error)) {
+    var url = getURL(quest, routes.quests.url);
+    if (isObject(quest) && (quest.success || quest.error)) {
       cb = quest;
       temp = quest.success;
 
@@ -375,7 +379,7 @@ window.rpg = (function (lib) {
     properties.
    **/
   lib.quest.create = function (quest, cb) {
-    if (typeof quest !== 'object') { return false; }
+    if (!isObject(quest)) { return false; }
     cb = cb || {};
 
     return ajax({
@@ -384,10 +388,40 @@ window.rpg = (function (lib) {
       contentType: 'application/json',
       data: quest,
       success: function (data) {
-        if (typeof cb.success === 'function') { cb.success(data); }
+        if (isFunction(cb.success)) { cb.success(data); }
       },
       error: function (msg, xhr) {
-        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
+        if (isFunction(cb.error)) { cb.error(msg, xhr); }
+      }
+    });
+  };
+  /** quest.modify
+      args: quest - (Quest object) original quest object for the skill being
+              modified
+            details - (hash table) describes the new properties of the quest, must
+              include the 'url' property of an existing quest
+
+    Takes the hash table and tries to send it to the backend as a modification set
+    on the quest passed in.
+   **/
+  lib.quest.modify = function (quest, details, cb) {
+    if (!isObject(quest)) { return false; }
+    if (!isObject(details)) { return false; }
+
+    cb = cb || {};
+    var url = getURL(quest, false);
+    if (!url) { return false; }
+
+    return ajax({
+      url: url,
+      type: 'PUT',
+      contentType: 'application/json',
+      data: details,
+      success: function (data) {
+        if (isFunction(cb.success)) { cb.success(data); }
+      },
+      error: function (msg, xhr) {
+        if (isFunction(cb.error)) { cb.error(msg, xhr); }
       }
     });
   };
@@ -399,8 +433,16 @@ window.rpg = (function (lib) {
     the Player with the rewards of the quest being completed.
    **/
   lib.quest.complete = function (quest, player, cb) {
-    if (typeof quest !== 'object' || !quest.url) { return false; }
-    if (typeof player !== 'object' && typeof player !== 'string') { return false; }
+    if (isObject(quest) && quest.quest && quest.player) {
+      return generic(
+        quest.url,
+        '',
+        'POST',
+        cb);
+    }
+
+    if (!isObject(quest) || !quest.url) { return false; }
+    if (!isObject(player) && !isString(player)) { return false; }
 
     player = player.id ? player.id : player;
 
@@ -408,6 +450,18 @@ window.rpg = (function (lib) {
       quest.url,
       { 'player': player },
       'POST',
+      cb);
+  };
+  /** quests.pending
+    Retrieves the list of pending quest requests.
+   **/
+  lib.quest.pending = function (cb) {
+    cb = cb || {};
+
+    return generic(
+      routes.requests.url,
+      '',
+      'GET',
       cb);
   };
   // }}}
@@ -425,7 +479,7 @@ window.rpg = (function (lib) {
     if (!ready) { return queue.push(function () { lib.skill.get(skill, cb); }); }
 
     var url = getURL(skill, routes.skills.url);
-    if (typeof skill === 'object' && (skill.success || skill.error)) {
+    if (isObject(skill) && (skill.success || skill.error)) {
       cb = skill;
       temp = skill.success;
 
@@ -448,12 +502,12 @@ window.rpg = (function (lib) {
     provided, it will change from the default of 10.
    **/
   lib.skill.leaders = function (skill, limit, cb) {
-    if (typeof skill !== 'object') { return false; }
+    if (!isObject(skill)) { return false; }
     cb = cb || {};
     var params = '';
 
     var url = skill.leaders;
-    if (typeof limit === 'object') {
+    if (isObject(limit)) {
       cb = limit;
     } else {
       params = { 'limit': limit };
@@ -473,7 +527,7 @@ window.rpg = (function (lib) {
     properties.
    **/
   lib.skill.create = function (skill, cb) {
-    if (typeof skill !== 'object') { return false; }
+    if (!isObject(skill)) { return false; }
     cb = cb || {};
 
     return ajax({
@@ -482,10 +536,40 @@ window.rpg = (function (lib) {
       contentType: 'application/json',
       data: skill,
       success: function (data) {
-        if (typeof cb.success === 'function') { cb.success(data); }
+        if (isFunction(cb.success)) { cb.success(data); }
       },
       error: function (msg, xhr) {
-        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
+        if (isFunction(cb.error)) { cb.error(msg, xhr); }
+      }
+    });
+  };
+  /** skill.modify
+      args: skill - (Skill object) original skill object for the skill being
+              modified
+            details - (hash table) describes the new properties of the skill, must
+              include the 'url' property of an existing skill
+
+    Takes the hash table and tries to send it to the backend as a modification set
+    on the skill passed in.
+   **/
+  lib.skill.modify = function (skill, details, cb) {
+    if (!isObject(skill)) { return false; }
+    if (!isObject(details)) { return false; }
+
+    cb = cb || {};
+    var url = getURL(skill, false);
+    if (!url) { return false; }
+
+    return ajax({
+      url: url,
+      type: 'PUT',
+      contentType: 'application/json',
+      data: details,
+      success: function (data) {
+        if (isFunction(cb.success)) { cb.success(data); }
+      },
+      error: function (msg, xhr) {
+        if (isFunction(cb.error)) { cb.error(msg, xhr); }
       }
     });
   };
@@ -503,14 +587,9 @@ window.rpg = (function (lib) {
   lib.classes.get = function (cls, cb) {
     if (!ready) { return queue.push(function () { lib.classes.get(cls, cb); }); }
 
-    var url = getURL(cls, classes.routes.url);
-    if (typeof cls === 'object' && (cls.success || cls.error)) {
+    var url = getURL(cls, routes.classes.url);
+    if (isObject(cls) && (cls.success || cls.error)) {
       cb = cls;
-      cb.success = function (data_) {
-        if (!cls.success) { return; }
-
-        cls.success(data);
-      };
     }
 
     return generic(
@@ -527,7 +606,7 @@ window.rpg = (function (lib) {
     properties.
    **/
   lib.classes.create = function (cls, cb) {
-    if (typeof cls !== 'object') { return false; }
+    if (!isObject(cls)) { return false; }
     cb = cb || {};
 
     return ajax({
@@ -536,14 +615,15 @@ window.rpg = (function (lib) {
       contentType: 'application/json',
       data: cls,
       success: function (data) {
-        if (typeof cb.success === 'function') { cb.success(data); }
+        if (isFunction(cb.success)) { cb.success(data); }
       },
       error: function (msg, xhr) {
-        if (typeof cb.error === 'function') { cb.error(msg, xhr); }
+        if (isFunction(cb.error)) { cb.error(msg, xhr); }
       }
     });
   };
   // }}}
+
   // utils {{{
   lib.utils = {};
   /** utils.runFormula
@@ -564,8 +644,12 @@ window.rpg = (function (lib) {
     // Strip all chars except `n` (hopefully makes formula safe)
     formula = formula.replace(/[A-Za-mo-z\[\]]+/g, "");
     var vals = {};
-    for (var i = min; i <= max; i++) {
-      vals[i] = eval("n=" + i + ";" + formula + ";");
+    try {
+      for (var i = min; i <= max; i++) {
+        vals[i] = eval("n=" + i + ";" + formula + ";");
+      }
+    } catch (err) {
+      return [];
     }
 
     return vals;
