@@ -22,12 +22,12 @@
         <input type="text" name="formula" placeholder="Skill leveling formula" />
         <div class="leveling"></div>
         <input type="submit" value="Create Skill" />
-        <button type="button">Close</button>
+        <button type="cancel">Close</button>
       </form>
       */}),
     "levels": lib.template(function () {/*
       <% _.each(levels, function (level, index) { %>
-        <span>Lvl {{ index }}: {{ level }} XP</span>
+        <span>Lvl {{ index }}: {{ level }} SP</span>
       <% }); %>
       */}),
     "list": lib.template(function () {/*
@@ -38,7 +38,7 @@
     "read": lib.template(function () {/*
       <h1>{{ name }}</h1>
       <h3>Leaders</h3>
-      <button type="button">Close</button>
+      <button type="cancel">Close</button>
       */}),
     "leaders": lib.template(function () {/*
       <% _.each(leaders, function (leader) { %>
@@ -53,7 +53,7 @@
         <input type="text" name="formula" value="{{ formula }}" />
         <div class="leveling"></div>
         <input type="submit" value="Update Skill" />
-        <button type="button">Close</button>
+        <button type="cancel">Close</button>
       </form>
       */})
   };
@@ -121,7 +121,6 @@
           }
         }
       });
-      win.find("button[type=button]").click(win.close);
     };
 
     rpg.skill.get(url, { "success": render });
