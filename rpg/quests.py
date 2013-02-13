@@ -4,7 +4,7 @@ completion of quests.  The quests are tasks that are performed that give
 rewards to the player characters.  They can be defined, modified/tweaked, and
 completed by players.
 '''
-from flask import session, request
+from flask import session, request, redirect, url_for
 from . import app, filter_keys
 from . import roles, logger, skills
 from .decorators import datatype, require_permissions, intersect
@@ -38,6 +38,34 @@ def create_quest():
         return "Packet missing required keys", httplib.BAD_REQUEST
 
     return info, httplib.CREATED
+
+
+@app.route("/quest/<quest_id>", methods=["PUT"])
+@datatype
+@require_permissions(roles.ROOT, roles.ADMIN)
+def modify_quest(quest_id):
+    ''' modify_quest -> PUT /quest/<quest_id>
+        PUT: <JSON DATA>
+    Submits a set of information to use to modify the quest specified by the
+    <quest_id> parameter.
+    '''
+    if not request.json:
+        return "PUT body must be a JSON document for the quest to be " + \
+            "updated.", httplib.BAD_REQUEST
+
+    quest_info = request.json
+    quest_info['id'] = quest_id
+
+    try:
+        quest_info = Quest.modify(quest_info, session['id'])
+        if not quest_info:
+            return httplib.BAD_REQUEST
+    except errors.NonMongoDocumentError as err:
+        logger.info(err)
+        return "Trying to modify a non existent skill", httplib.BAD_REQUEST
+
+    return redirect(url_for('get_quest', quest_id=quest_id)) \
+        if request.is_html else (quest_info, httplib.ACCEPTED)
 
 
 @app.endpoint("/quest", methods=["GET"])
