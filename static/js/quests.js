@@ -56,6 +56,8 @@
     "read": lib.template(function () {/*
       <h1>{{ name }}</h1>
       <div>{{ description }}</div>
+      <button type="submit">Request Completion</button>
+      <button type="cancel">Close</button>
       */}),
     "edit": lib.template(function () {/*
       <form action="">
@@ -65,13 +67,30 @@
         <textarea name="description">{{ description }}</textarea>
         <input type="submit" value="Update Quest" />
       </form>
+      */}),
+    "pendingList": lib.template(function () {/*
+      <h1>Pending Quests</h1>
+      <% _.each(quests, function (quest, index) { %>
+        <a href="javascript:;" data-index={{ index }}>{{ quest.name }}</a>
+      <% }); %>
+      */}),
+    "confirm": lib.template(function () {/*
+      <h3>Confirm completion?</h3>
+      <div>Player: {{ player.name }}</div>
+      <div>Quest: {{ quest.name }}</div>
+      <button type="confirm">Confirm</button>
+      <button type="cancel">Cancel</button>
       */})
   };
 
   var showIndividual = function (url) {
     var win = lib.window("quests single")
      , render = function (quest) {
-      var user = window.user.getUser();
+      var user = window.user.getUser(), player;
+
+      rpg.player.get(user.player, {
+        "success": function (p) { player = p; }
+      });
 
       win.append(templates[user.roles.isDM ? "edit" : "read"](quest))
         .render()
@@ -83,6 +102,14 @@
           evt.stopPropagation();
           evt.preventDefault();
           return false;
+        })
+        .on("click", "button[type=submit]", function (evt) {
+          rpg.player.quest(player, quest, { "success": win.close });
+        })
+        .on("click", "a", function (evt) {
+          var anchor = $(evt.target);
+          anchor.hide().next().show().focus();
+          win.find("input[type=submit]").show();
         });
       };
 
@@ -127,7 +154,7 @@
             skills = skills_;
             choiceWin.append(templates.rewards({ "skills": skills }))
               .center()
-              .find("select").focus();
+              .focus();
           }
         });
       } else {
@@ -157,5 +184,45 @@
   };
 
   var showPendingQuests = function () {
+    var win = lib.window("quests pending");
+
+    var render = function (quests) {
+      win.append(templates.pendingList({ "quests": quests }))
+        .render()
+        .find("a").on("click", function (evt) {
+          var request = quests[parseInt($(evt.target).attr("data-index"))];
+          var confirmWindow = lib.window("quests confirm");
+          var player, quest;
+
+          var build = function () {
+            confirmWindow.append(templates.confirm({
+              "player": player, "quest": quest, "request": request
+            })).render()
+            .find("button").on("click", function (evt) {
+              var button = $(evt.target);
+              if (button.attr("type") === "confirm") {
+                rpg.quest.complete(request, { "success": confirmWindow.close });
+              } else {
+                confirmWindow.close();
+              }
+            });
+          };
+
+          rpg.player.get(request.player, {
+            "success": function (p) {
+              player = p;
+              if (quest) { build(); }
+            }
+          });
+          rpg.quest.get(request.quest, {
+            "success": function (q) {
+              quest = q;
+              if (player) { build(); }
+            }
+          });
+        });
+    };
+
+    rpg.quest.pending({ "success": showPendingQuests });
   };
 }(window.quests = {}));
