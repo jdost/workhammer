@@ -33,13 +33,13 @@
       */}),
     "editor": lib.template(function () {/*
       <form action="">
-      <a href="javascript:;">
-        <h1>{{ name }}</h1>
-      </a>
-      <input name="name" value="{{ name }}" />
+        <a href="javascript:;">
+          <h1>{{ name }}</h1>
+        </a>
+        <input type="text" name="name" value="{{ name }}" />
 
-      <input type="submit" value="Update Player" />
-      <button type="cancel">Cancel</button>
+        <input type="submit" value="Update Player" />
+        <button type="cancel">Cancel</button>
       </form>
       */})
   };
@@ -81,6 +81,10 @@
       }
     });
 
-    win.render();
+    win.render()
+      .on("success", function (p) {
+        win.close();
+        showPlayer(p);
+      });
   };
 }(window.player = {}));
