@@ -56,7 +56,7 @@
 
   var showPlayer = exports.showPlayer = function (player) {
     var win = lib.window("player viewer");
-    var edittable = typeof player !== object;
+    var edittable = typeof player !== "object";
 
     if (!player) { player = window.user.getUser().player; }
 
