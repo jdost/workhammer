@@ -4,5 +4,3 @@ settings.py
 env/*
 .env/*
 .venv
-
-*.wav

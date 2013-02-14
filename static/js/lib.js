@@ -62,7 +62,9 @@
         evt.preventDefault();
         evt.stopPropagation();
         return false;
-      });
+      }).on("click", "a, :button", function () { sfx.play("select"); })
+      .on("error", function () { sfx.play("error"); })
+      .on("success", function () { sfx.play("succes"); });
 
     win.focus = function () {
       win.find(":input, a").first().focus();

@@ -16,6 +16,7 @@
       } else if (evt.which === 40 || evt.which === 38) { // Arrows
         var els = $(".window").last().find("a, :input, select").filter(":visible");
         if (els.length === 0) { return; }
+        window.app.sfx.play("move");
         var id = els.index($(":focus").first()) + (evt.which === 40 ? 1 : -1);
         if (id < 0) { id = els.length-1; }
         else if (id >= els.length) { id = 0; }
@@ -26,6 +27,26 @@
 
   window.rpg.ready(setup);
   window.app = {};
+
+  (function (exports) {
+    var clips = {};
+
+    $(document).ready(function () {
+      $("audio").each(function () {
+        var el = this;
+        clips[el.getAttribute("name")] = el;
+      });
+    });
+
+    exports.play = function (name) {
+      if (!clips[name]) { return; }
+      var clip = clips[name];
+
+      clip.pause();
+      clip.currentTime = 0;
+      clip.play();
+    };
+  }(window.app.sfx = {}));
 
   window.app.loggedIn = function () {
     var user = window.user.getUser();
