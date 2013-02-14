@@ -48,12 +48,13 @@ input[type="password"] {
 }
 input[type="submit"],
 input[type="button"],
-button[type="button"] {
+button {
   border: solid 0.2em @blue;
   background: @bg;
   padding: 0.33em;
   margin: 0.2em auto;
   color: @fg;
+  &[type="cancel"] { background: @red; }
   &:hover,
   &:focus {
     background: @blue;
