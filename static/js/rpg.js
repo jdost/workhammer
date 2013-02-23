@@ -23,7 +23,7 @@ window.rpg = (function (lib) {
 
   lib.loggedIn = function () { return loggedIn; };
   lib.ready = function (func) {
-    if (typeof func === 'function') {
+    if (isFunction(func)) {
       if (ready) { return func(); }
       return queue.push(func);
     }
@@ -100,17 +100,17 @@ window.rpg = (function (lib) {
   }
 
   function generic(url, data, method, cb) {
-    cb = typeof cb === 'undefined' ? {} : cb;
+    cb = isUndefined(cb) ? {} : cb;
 
     return ajax({
       url: url,
       data: data,
       type: method,
       success: function (data) {
-        if (typeof cb.success === 'function') { cb.success(data); }
+        if (isFunction(cb.success)) { cb.success(data); }
       },
       error: function (data, xhr) {
-        if (typeof cb.error === 'function') { cb.error(data, xhr); }
+        if (isFunction(cb.error)) { cb.error(data, xhr); }
       }
     });
   };
@@ -127,6 +127,7 @@ window.rpg = (function (lib) {
   function isFunction (a) { return typeof a === 'function'; };
   function isObject (a) { return typeof a === 'object'; };
   function isString (a) { return typeof a === 'string'; };
+  function isUndefined (a) { return typeof a === 'undefined'; };
 
   /**  NOTE
     All of these ajax functions have an optional last argument, this is the
