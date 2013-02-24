@@ -245,7 +245,7 @@ window.rpg = (function (lib) {
     var url = getURL(player, routes.players.url);
     if (player.success || player.error) {
       cb = player;
-      temp = player.success;
+      var temp = player.success;
 
       cb.success = function (data) {
         temp ? temp(lib.utils.convertArray(data)) : "";
@@ -358,7 +358,7 @@ window.rpg = (function (lib) {
     var url = getURL(quest, routes.quests.url);
     if (isObject(quest) && (quest.success || quest.error)) {
       cb = quest;
-      temp = quest.success;
+      var temp = quest.success;
 
       cb.success = function (data) {
         temp ? temp(lib.utils.convertArray(data)) : "";
@@ -434,6 +434,10 @@ window.rpg = (function (lib) {
    **/
   lib.quest.complete = function (quest, player, cb) {
     if (isObject(quest) && quest.quest && quest.player) {
+      if (isObject(player) && (player.success || player.error)) {
+        cb = player;
+      }
+
       return generic(
         quest.url,
         '',
@@ -481,7 +485,7 @@ window.rpg = (function (lib) {
     var url = getURL(skill, routes.skills.url);
     if (isObject(skill) && (skill.success || skill.error)) {
       cb = skill;
-      temp = skill.success;
+      var temp = skill.success;
 
       cb.success = function (data) {
         temp ? temp(lib.utils.convertArray(data)) : "";

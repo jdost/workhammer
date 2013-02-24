@@ -34,6 +34,7 @@
       <% _.each(skills, function (skill) { %>
         <a href="{{ skill.url }}">{{ skill.name }}</a>
       <% }); %>
+      <button type="cancel">Close</button>
       */}),
     "read": lib.template(function () {/*
       <h1>{{ name }}</h1>
@@ -100,17 +101,18 @@
           evt.stopPropagation();
           evt.preventDefault();
           return false;
-        });
-      win.find("a").on("click", function (evt) {
-          $(evt.target).hide();
-          var input = $(evt.target).next();
-          input.show().focus();
+        })
+        .on("click", "a", function (evt) {
+          var anchor = $(evt.target);
+          anchor.hide()
+            .next().show().focus();
           win.find(":submit").show();
           if (input.attr("name") === "formula")
             formulaUpdate(input);
+        })
+        .on("keyup", "input[name=formula]", function (evt) {
+          formulaUpdate(evt.target);
         });
-      win.find("input[name=formula]")
-        .on("keyup", function (evt) { formulaUpdate(evt.target); });
 
       rpg.skill.leaders(skill, {
         "success": function (leaders) {

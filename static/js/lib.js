@@ -62,9 +62,9 @@
         evt.preventDefault();
         evt.stopPropagation();
         return false;
-      }).on("click", "a, :button", function () { sfx.play("select"); })
-      .on("error", function () { sfx.play("error"); })
-      .on("success", function () { sfx.play("succes"); });
+      }).on("click", "a, :button", function () { app.sfx.play("select"); })
+      .on("error", function () { app.sfx.play("error"); })
+      .on("success", function () { app.sfx.play("succes"); });
 
     win.focus = function () {
       win.find(":input, a").first().focus();
@@ -112,7 +112,11 @@
         }
         key = keys[i];
       }
-      field[key] = input.val();
+      if (input.attr("type") === "number") {
+        field[key] = parseInt(input.val(), 10);
+      } else {
+        field[key] = input.val();
+      }
     });;
 
     return data;

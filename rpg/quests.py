@@ -171,7 +171,7 @@ def complete_quest(log_id):
     try:
         log, quest, player = QuestLog.update(log_id)
         apply_quest(quest, player)
-        logger.info("%s (%s) completed %s (%s), approve by %s",
+        logger.info("%s (%s) completed %s (%s), approved by %s",
                     player["name"], player["id"], quest["name"], quest["id"],
                     session["id"])
     except errors.NoEntryError as err:

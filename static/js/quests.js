@@ -31,6 +31,7 @@
         <h3>Rewards</h3>
         <input type="button" value="Add Reward" />
         <input type="submit" value="Create Quest" />
+        <button type="cancel">Close</button>
       </form>
       */}),
     "rewards": lib.template(function () {/*
@@ -42,21 +43,25 @@
         </select>
         <input type="text" name="reward"  placeholder="SP reward" />
         <input type="submit" value="Add reward" />
+        <button type="cancel">Close</button>
       </form>
       */}),
     "rewardList": lib.template(function () {/*
       <div class="reward">{{ name }} +{{ reward }} SP</div>
-      <input type="hidden" name="rewards.skills.{{ id }}" value="{{ reward }}" />
+      <input type="number" name="rewards.skills.{{ id }}" value="{{ reward }}" />
       */}),
     "list": lib.template(function () {/*
       <% _.each(quests, function (quest, index) { %>
         <a href="{{ quest.url }}">{{ quest.name }}</a>
       <% }); %>
+      <button type="cancel">Close</button>
       */}),
     "read": lib.template(function () {/*
       <h1>{{ name }}</h1>
       <div>{{ description }}</div>
-      <button type="submit">Request Completion</button>
+      <% if (request) { %>
+        <button type="request">Request</button>
+      <% } %>
       <button type="cancel">Close</button>
       */}),
     "edit": lib.template(function () {/*
@@ -65,14 +70,22 @@
         <input type="text" name="name" value="{{ name }}" />
         <a href="javascript:;"><div>{{ description }}</div></a>
         <textarea name="description">{{ description }}</textarea>
-        <input type="submit" value="Update Quest" />
+        <!-- Rewards List -->
+        <input type="submit" value="Update" />
+        <% if (request) { %>
+          <button type="request">Request</button>
+        <% } %>
+        <button type="cancel">Close</button>
       </form>
       */}),
     "pendingList": lib.template(function () {/*
       <h1>Pending Quests</h1>
-      <% _.each(quests, function (quest, index) { %>
-        <a href="javascript:;" data-index={{ index }}>{{ quest.name }}</a>
+      <% _.each(requests, function (request, index) { %>
+        <a href="javascript:;" data-index={{ index }}>
+          {{ request.quest.name }} - {{ request.player.name }}
+        </a>
       <% }); %>
+      <button type="cancel">Close</button>
       */}),
     "confirm": lib.template(function () {/*
       <h3>Confirm completion?</h3>
@@ -88,9 +101,12 @@
      , render = function (quest) {
       var user = window.user.getUser(), player;
 
-      rpg.player.get(user.player, {
-        "success": function (p) { player = p; }
-      });
+      quest.request = typeof user.player !== 'undefined';
+      if (user.player) {
+        rpg.player.get(user.player, {
+          "success": function (p) { player = p; }
+        });
+      }
 
       win.append(templates[user.roles.isDM ? "edit" : "read"](quest))
         .render()
@@ -103,7 +119,7 @@
           evt.preventDefault();
           return false;
         })
-        .on("click", "button[type=submit]", function (evt) {
+        .on("click", "button[type=request]", function (evt) {
           rpg.player.quest(player, quest, { "success": win.close });
         })
         .on("click", "a", function (evt) {
@@ -185,44 +201,48 @@
 
   var showPendingQuests = function () {
     var win = lib.window("quests pending");
+    var requests, players, quests;
 
-    var render = function (quests) {
-      win.append(templates.pendingList({ "quests": quests }))
+    var render = function () {
+      if (_.isUndefined(requests) || _.isUndefined(players)
+          || _.isUndefined(quests)) { return; }
+      requests = _.map(requests, function (req) {
+        req.player = players[req.player.id];
+        req.quest = quests[req.quest.id];
+        return req;
+      });
+      win.append(templates.pendingList({ "requests": requests }))
         .render()
-        .find("a").on("click", function (evt) {
-          var request = quests[parseInt($(evt.target).attr("data-index"))];
+        .on("click", "a", function (evt) {
+          console.log(evt);
+          var request = requests[parseInt($(evt.target).attr("data-index"))];
+          console.log(request);
           var confirmWindow = lib.window("quests confirm");
-          var player, quest;
 
-          var build = function () {
-            confirmWindow.append(templates.confirm({
-              "player": player, "quest": quest, "request": request
-            })).render()
-            .find("button").on("click", function (evt) {
-              var button = $(evt.target);
-              if (button.attr("type") === "confirm") {
-                rpg.quest.complete(request, { "success": confirmWindow.close });
-              } else {
-                confirmWindow.close();
-              }
-            });
-          };
-
-          rpg.player.get(request.player, {
-            "success": function (p) {
-              player = p;
-              if (quest) { build(); }
-            }
-          });
-          rpg.quest.get(request.quest, {
-            "success": function (q) {
-              quest = q;
-              if (player) { build(); }
+          confirmWindow.append(templates.confirm(request))
+          .render()
+          .on("click", "button", function (evt) {
+            var button = $(evt.target);
+            if (button.attr("type") === "confirm") {
+              rpg.quest.complete(request, { "success": confirmWindow.close });
+            } else {
+              confirmWindow.close();
             }
           });
         });
     };
 
-    rpg.quest.pending({ "success": showPendingQuests });
+    rpg.quest.pending({ "success": function (r) {
+      requests = r;
+      render();
+    } });
+    rpg.quest.get({ "success": function (q) {
+      quests = q;
+      render();
+    } });
+    rpg.player.get({ "success": function (p) {
+      players = p;
+      render();
+    } });
   };
 }(window.quests = {}));

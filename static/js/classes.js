@@ -19,6 +19,7 @@
       <% _.each(classes, function (cls) { %>
         <a href="{{ cls.url }}">{{ cls.name }}</a>
       <% }); %>
+      <button type="cancel">Close</button>
       */}),
     "builder": lib.template(function () {/*
       <form action="javascript:rpg.classes.create;" method="POST"
@@ -27,8 +28,10 @@
         <input type="text" name="formula" placeholder="Class leveling formula" />
         <div class="leveling"></div>
 
+        <h3>Class skills</h3>
         <button type="add">Add Skill</button>
         <input type="submit" value="Create Class" />
+        <button type="cancel">Close</button>
       </form>
       */}),
     "levels": lib.template(function () {/*
@@ -39,7 +42,7 @@
     "skills": lib.template(function () {/*
       <form action="">
         <select name="skill_id">
-        <% _.each(skills, function (skill) %>
+        <% _.each(skills, function (skill) { %>
           <option value="{{ skill.id }}">{{ skill.name }}</option>
         <% }); %>
         <input type="text" name="bonus" placeholder="XP per Skill level" />
@@ -49,7 +52,21 @@
       */}),
     "skillList": lib.template(function () {/*
       <div class="skill">{{ name }}: {{ bonus }} XP/Level</div>
-      <input type="hidden" name="skills.{{ id }}" value="{{ bonus }}" />
+      <input type="number" name="skills.{{ id }}" value="{{ bonus }}" />
+      */}),
+    "edit": lib.template(function () {/*
+      <form action ="">
+        <a href="javascript:;"><h1>{{ name }}</h1></a>
+        <input type="text" name="name" value="{{ name }}" />
+        <a href="javascript:;">Formula: {{ formula }}</a>
+        <input type="text" name="formula" value="{{ formula }}" />
+        <div class="leveling"></div>
+        <!-- Skills list --->
+        <input type="submit" value="Update Class" />
+        <button type="cancel">Close</button>
+      </form>
+      */}),
+    "read": lib.template(function () {/*
       */})
   };
 
@@ -61,7 +78,7 @@
         win.append(templates.list({ "classes": classes }))
           .on("click", "a", function (evt) {
             var anchor = $(evt.target);
-            console.log(anchor.attr("href"));
+            showIndividual(anchor.attr("href"));
 
             evt.stopPropagation();
             evt.preventDefault();
@@ -72,11 +89,55 @@
     });
   };
 
+  var showIndividual = function (url) {
+    var win = lib.window("classes single")
+     , formulaUpdate = function (input) {
+      var vals = rpg.utils.runFormula($(input).val(), 3);
+      if (vals.length === 0) { return; }
+
+      win.find(".leveling").empty().append(templates.levels({ "levels": vals }));
+    }, render = function (cls) {
+        var user = window.user.getUser();
+
+        win.append(templates[user.roles.isDM ? "edit" : "read"](cls))
+          .render()
+          .on("submit", function (evt) {
+            rpg.classes.modify(current, lib.getForm(evt.target), {
+              "success": function (data) { win.trigger('success', data); }
+            });
+
+            evt.stopPropagation();
+            evt.preventDefault();
+            return false;
+          });
+
+        win.find("a").on("click", function (evt) {
+            $(evt.target).hide();
+            var input = $(evt.target).next();
+            input.show().focus();
+            win.find(":submit").show();
+            if (input.attr("name") === "formula")
+              formulaUpdate(input);
+          });
+        win.find("input[name=formula]")
+          .on("keyup", function (evt) { formulaUpdate(evt.target); });
+        };
+
+    rpg.classes.get(url, { "success": render });
+    win.on("success", function (evt, cls) {
+      win.empty();
+      render(cls);
+    });
+  };
+
   var skills;
   var showBuilder = function () {
     var win = lib.window("classes builder");
 
     var skillBuilder = function (evt) {
+      evt.preventDefault();
+      evt.stopPropagation();
+
       var skillWin = lib.window("classes skillChooser");
 
       if (!skills) {
@@ -93,7 +154,7 @@
       }
 
       skillWin.render()
-        .on("submit", function (evt) {
+        .on("submit", function (evt_) {
           var select = skillWin.find("select");
           var input = templates.skillList({
             "id": select.val(),
@@ -105,6 +166,8 @@
           skillWin.close();
           $(evt.target).focus();
         });
+
+      return false;
     };
 
     var formulaUpdate = function (evt) {

@@ -18,6 +18,7 @@
     };
   };
   exports.getUser = function () { return user; };
+  exports.reload = function () { rpg.user.get({ success: buildUser }); };
   // Menu listing creation
   window.menu.add("Login", {
     "exec": function () { return showLogin(); },
@@ -46,6 +47,7 @@
         <input type="text" name="username" placeholder="username" />
         <input type="password" name="password" placeholder="password" />
         <input type="submit" name="Login" value="Login" />
+        <button type="cancel">Close</button>
       </form>
       <div class="message"></div>
       <a id="register" href="javascript:;">Register</a>
@@ -56,6 +58,7 @@
         <input type="password" name="password" placeholder="password" />
         <input type="password" name=".match" placeholder="repeat password" />
         <input type="submit" name="Register" value="Register" />
+        <button type="cancel">Close</button>
       </form>
       <div class="message"></div>
       */})

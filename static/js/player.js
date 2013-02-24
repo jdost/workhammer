@@ -51,11 +51,12 @@
 
     win.render()
       .on("success", showPlayer)
+      .on("success", window.user.reload)
       .on("success", win.remove);
   };
 
   var showPlayer = exports.showPlayer = function (player) {
-    var win = lib.window("player viewer");
+    var win = lib.window("player viewer single");
     var edittable = typeof player !== "object";
 
     if (!player) { player = window.user.getUser().player; }
@@ -76,7 +77,7 @@
             var anchor = $(evt.target);
             anchor.hide()
               .next().show().focus();
-            win.find("input[type=submit]").show();
+            win.find(":submit").show();
           });
       }
     });
