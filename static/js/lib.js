@@ -106,8 +106,10 @@
       if (input.attr("name")[0] === ".") { return; }
       var field = data, keys = input.attr("name").split("."), key;
       for (var i = 0, l = keys.length; i < l; i++) {
-        if (key) {
+        if (key && !field[key]) {
           field[key] = {};
+        }
+        if (key) {
           field = field[key];
         }
         key = keys[i];
