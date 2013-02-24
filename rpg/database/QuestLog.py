@@ -20,7 +20,7 @@ def __clean(packet):
         },
         'status': packet['status'],
         'url': url_for('complete_quest', log_id=str(packet['_id'])),
-        'completed': packet['created']
+        'completed': packet['created'] if packet['status'] == 0 else ''
     }
 
 
@@ -37,8 +37,8 @@ def add(quest_id, player_id, user_id, status=0):
     player = Player.get(player_id)
 
     id = database.insert({
-        'quest': ObjectId(quest_id),
-        'player': ObjectId(player_id),
+        'quest': ObjectId(quest['id']),
+        'player': ObjectId(player['id']),
         'created_by': ObjectId(user_id),
         'created': datetime.utcnow(),
         'status': status
