@@ -110,8 +110,8 @@ def request_quest(player_id=None, quest_id=None):
     quest.  This requires that the user performing this request has permissions
     to do so.
     '''
-    player_id = request.form.get('player_id', player_id)
-    quest_id = request.form.get('quest_id', quest_id)
+    player_id = request.form.get('player', player_id)
+    quest_id = request.form.get('quest', quest_id)
     status = int(request.form.get('status', "1"))
 
     if status == 0 and not \

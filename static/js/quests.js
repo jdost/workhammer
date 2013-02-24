@@ -96,7 +96,7 @@
       */})
   };
 
-  var showIndividual = function (url) {
+  var showIndividual = exports.show = function (url) {
     var win = lib.window("quests single")
      , render = function (quest) {
       var user = window.user.getUser(), player;
@@ -121,6 +121,9 @@
         })
         .on("click", "button[type=request]", function (evt) {
           rpg.player.quest(player, quest, { "success": win.close });
+          evt.preventDefault();
+          evt.stopPropagation();
+          return false;
         })
         .on("click", "a", function (evt) {
           var anchor = $(evt.target);
