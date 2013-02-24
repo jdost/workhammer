@@ -42,14 +42,19 @@ input[type="password"] {
   padding-bottom: 0.33em;
   outline: none;
   width: 100%;
+  &:focus {
+    border-color: @blue;
+  }
 }
 input[type="submit"],
-input[type="button"] {
+input[type="button"],
+button {
   border: solid 0.2em @blue;
   background: @bg;
   padding: 0.33em;
   margin: 0.2em auto;
   color: @fg;
+  &[type="cancel"] { background: @red; }
   &:hover,
   &:focus {
     background: @blue;
@@ -64,7 +69,46 @@ textarea {
   background: @bg;
   outline: none;
   &:focus {
-    background: lighten(@bg, 5%);
+    border-color: @blue;
+  }
+}
+select {
+  background: transparent;
+  color: @fg;
+  border: solid 0.1em @fg;
+  -webkit-appearance: none;
+
+  &:hover,
+  &:focus {
+    cursor: pointer;
+    border-color: @blue;
+  }
+
+  option {
+    background: @bg;
+    color: @fg;
+  }
+
+  &:before { content: "<"; }
+  &:after { content: ">"; }
+}
+progress {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: @bg;
+  padding: 1px;
+  border: 0.1em solid @blue;
+
+  &::-webkit-progress-bar {
+    background: @bg;
+  }
+
+  &::-webkit-progress-bar-value,
+  &::-webkit-progress-value,
+  &::-moz-progress-bar {
+    background: @blue;
+    color: @blue;
   }
 }
 
@@ -82,3 +126,6 @@ textarea {
     }
   }
 }
+
+h1, h2, h3 { margin: 0; }
+a { h1, h2, h3 { display: inline-block; } }

@@ -1,47 +1,71 @@
-.player {
-  width: 40em;
-  height: 30em;
+.player.viewer {
+  width: 30em;
 
-  .playerProfile {
-  	width: 100%;
-  	height: 40%;
-
-  	.playerProfileImg {
-  		float: left;
-  		width: 80px;
-  		height: 80px;
-  		background-color: #FFF;
-  		margin-right: 10px;
-  	}
-
-  	.playerProfileInfo {
-  		float: left;
-
-  		.playerNameBioWrapper {
-
-	  		.playerName {
-	  			float: left;
-	  			font-size: 1.5em;
-	  			margin-right: 5px;
-	  		}
-	  		.playerBio {
-	  			float: left;
-	  			font-size: 0.8em;
-	  		}
-	  		.playerLevel {
-	  			float: left;
-	  			font-size: 1.125em;
-	  			margin: 0 10px;
-	  		}
-  		}
-  	}
+  img {
+    float: left;
+    width: 80px;
+    height: 80px;
+    background-color: #FFF;
+    margin-right: 10px;
   }
 
-  .playerSkillsWrapper {
-  	float: left;
+  .info {
+    float: left;
+    h1 {
+      float: left;
+      display: inline;
+      margin-right: 5px;
+    }
+    a[name=bio] {
+      display: block;
+      clear: both;
+      float: left;
+      font-size: 0.8em;
+    }
+    h3 {
+      padding-top: 0.875em;
+      display: inline;
+      float: left;
+      font-size: 1.125em;
+      margin: 0 10px;
+    }
   }
 
-  .playerQuestsWrapper {
-  	float: left;
+  ul {
+    clear: both;
+    position: relative;
+
+    a {
+      li {
+        float: left;
+        display: inline;
+        list-style: none;
+      }
+      progress { float: right; }
+
+      &:before { float: left; }
+      &:after {
+        display: table;
+        content: "";
+        clear: both;
+      }
+    }
   }
+
+  .quests { display: none; } // Hide for now, not implemented
+
+  &.single input { display: none; }
+  &:after {
+    display: table;
+    content: "";
+    clear: both;
+  }
+}
+
+.player.builder {
+  width: 25em;
+}
+
+.player.bio {
+  width: 15em;
 }

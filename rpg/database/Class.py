@@ -13,6 +13,8 @@ def __simple(packet):
     '''
     return {
         "name": packet["name"],
+        "formula": packet["formula"],
+        "id": str(packet['_id']),
         "url": url_for("get_class", class_id=str(packet["_id"]))
     }
 

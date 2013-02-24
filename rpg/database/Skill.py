@@ -14,6 +14,7 @@ def __simple(packet):
     return {
         "name": packet["name"],
         "id": str(packet["_id"]),
+        "formula": packet["formula"],
         "url": url_for("get_skill", skill_id=str(packet["_id"]))
     }
 

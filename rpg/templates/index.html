@@ -7,7 +7,9 @@
       {{ style("user") }}
       {{ style("player") }}
       {{ style("app") }}
-      {{ style("quest")}}
+      {{ style("quests") }}
+      {{ style("skills") }}
+      {{ style("classes") }}
       <link href='http://fonts.googleapis.com/css?family=Press+Start+2P'
          rel='stylesheet' type='text/css' />
 
@@ -30,5 +32,12 @@
    </head>
    <body>
       <div id="start">Press &lt;Esc&gt; to Start</div>
+
+      <div id="sfx">
+         <audio src="{{ static('bin/move.wav') }}" name="move"></audio>
+         <audio src="{{ static('bin/error.wav') }}" name="error"></audio>
+         <audio src="{{ static('bin/select.wav') }}" name="select"></audio>
+         <audio src="{{ static('bin/success.wav') }}" name="success"></audio>
+      </div>
    </body>
 </html>

@@ -57,15 +57,17 @@
         evt.stopPropagation();
         evt.preventDefault();
         return false;
-      });
+      }).on("click", "button[type=cancel]", function (evt) {
+        win.close();
+        evt.preventDefault();
+        evt.stopPropagation();
+        return false;
+      }).on("click", "a, :button", function () { app.sfx.play("select"); })
+      .on("error", function () { app.sfx.play("error"); })
+      .on("success", function () { app.sfx.play("succes"); });
 
-    var container = exports.el("div")
-        .addClass("container");
-    win.render = function (uncontained) {
-      container.append(win);
-      $(document.body).append(uncontained ? win : container);
+    win.focus = function () {
       win.find(":input, a").first().focus();
-      win.center();
       return win;
     };
     win.close = function () {
@@ -74,6 +76,14 @@
     win.center = function () {
       win.css('margin-top', '-' + (win.outerHeight(true)/2).toString() + 'px');
       return win;
+    };
+
+    var container = exports.el("div")
+        .addClass("container");
+    win.render = function (uncontained) {
+      container.append(win);
+      $(document.body).append(uncontained ? win : container);
+      return win.center().focus();
     };
 
     return win;
@@ -102,7 +112,11 @@
         }
         key = keys[i];
       }
-      field[key] = input.val();
+      if (input.attr("type") === "number") {
+        field[key] = parseInt(input.val(), 10);
+      } else {
+        field[key] = input.val();
+      }
     });;
 
     return data;
@@ -141,5 +155,28 @@
         interpolate : /\{\{(.+?)\}\}/g
       });
     };
+  };
+  /** lib.progressBar
+    Creates a progress bar using the provided arguments.  The progress bar will be
+    an element set that will show a bar with a progress fill that fills the
+    percentage of the determined progress.  The arguments can either be:
+      - a single argument, either a floating percentage ( < 1 ) or an integer
+        percentage ( > 0 && < 100)
+      - three integers, the first being the current value, second being the base,
+        third being the target value, so: [second] < [first] < [third]
+   **/
+  var progressTemplate = exports.template(function () {/*
+    <progress value={{ perc }}></progress>
+    */});
+  exports.progressBar = function (perc, base, tgt) {
+    if (base && tgt) {
+      tgt -= base;
+      perc = (perc - base)/tgt;
+    }
+    if (perc > 1) {
+      perc = perc/100;
+    }
+
+    return progressTemplate({ "perc": perc });
   };
 }(window.lib = {}));
