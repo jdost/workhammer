@@ -190,3 +190,30 @@ class QuestTest(TestBase):
         self.assertEqual(len(player['quests']), 1,
                          "Quests list does not have all of the completed " +
                          "quests in it.")
+
+    def test_modify_quest(self):
+        ''' Test modifying a quest
+        Creates a basic quest, then changes the quest and checks that the
+        changes were applied.
+        '''
+        quest_name = "changed"
+
+        quest = self.create_quest(self.quest)
+        response = self.app.get(quest["url"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        orig_quest = json.loads(response.data)
+
+        response = self.app.put(quest["url"],
+                                data=json.dumps({"name": quest_name}),
+                                content_type="application/json",
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+
+        response = self.app.get(quest["url"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        new_quest = json.loads(response.data)
+
+        self.assertEqual(new_quest["name"], quest_name)
+        self.assertNotEqual(new_quest["name"], orig_quest["name"])
