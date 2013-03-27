@@ -36,10 +36,10 @@ def create_player():
         if not intersect(session["role"], [roles.ADMIN, roles.ROOT]):
             return "You do not have permissions to create a player for " + \
                    "another user.", httplib.UNAUTHORIZED
-        target_user = User.lookup(id=player_info["user"])
+        target_user = User.lookup(id=player_info["user"], private=True)
         if not target_user:
             return "Targetted user does not exist", httplib.NOT_FOUND
-        elif "PLAYER" in target_user["role"]:
+        elif roles.PLAYER in target_user["role"]:
             return "User already has a player", httplib.CONFLICT
     elif roles.PLAYER in session["role"] and "player" in session:
         return "User already has a player.", httplib.CONFLICT
@@ -50,17 +50,24 @@ def create_player():
 
     try:
         info, id = Player.create(player_info, session['id'])
-        logger.info("Player %s (%s) was created for user %s.", info["name"],
-                    info["id"], session["id"])
+        logger.info("Player %s (%s) was created for user %s by %s.",
+                    info["name"], info["id"], player_info["user"],
+                    session["id"])
+
         if player_info["user"] == session["id"]:  # update session
             session["player"] = id
             session["role"] = session["role"] + [roles.PLAYER]
+            new_roles = session["role"]
+        else:
+            target = User.lookup(id=player_info["user"], private=True)
+            new_roles = target["role"] + [roles.PLAYER]
 
         User.modify({  # This adds the PLAYER role to the user
-            "role": session["role"],
+            "role": new_roles,
             "id": player_info["user"],
             "player": ObjectId(id)
         }, session["id"])
+
     except errors.MissingInfoError as err:
         logger.info(err)
         return "Packet missing required keys", httplib.BAD_REQUEST

@@ -110,7 +110,7 @@ def login(username, pwhash):
         else (None, None, None)
 
 
-def lookup(username=None, id=None):
+def lookup(username=None, id=None, private=False):
     ''' User.lookup
     Retrieves the user info from the database using the provided identity
     information.  Takes either the user's ID or username, returns None if no
@@ -126,7 +126,7 @@ def lookup(username=None, id=None):
         return None
 
     user = database.find_one(packet)
-    if user:
+    if user and not private:
         user = __public_user(user)
 
     return user

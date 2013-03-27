@@ -66,6 +66,23 @@ class ClassTest(TestBase):
         self.assertEqual(cls["name"], server["name"],
                          "Returned class' name is not the defined name.")
 
+        response = self.app.get(self.endpoints["classes"]["url"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        class_list = json.loads(response.data)
+        self.assertEqual(len(class_list), 1, "Class not in class list")
+
+    def test_create_bad_class(self):
+        ''' Tests creating bad class
+        '''
+        response = self.app.post(self.endpoints["classes"]["url"],
+                                 data="classstuff")
+        self.assertHasStatus(response, httplib.BAD_REQUEST)
+
+        cls = self.create_class()
+        response = self.app.put(cls["url"], data="changed")
+        self.assertHasStatus(response, httplib.BAD_REQUEST)
+
     def test_create_bad_skill(self):
         ''' Tests creating a skill with missing information
         Attempts to create a skill with missing information, makes sure the

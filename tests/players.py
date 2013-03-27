@@ -37,6 +37,16 @@ class PlayerTest(TestBase):
         self.assertHasStatus(response, httplib.OK)
         return json.loads(response.data)
 
+    def send_player(self, player):
+        ''' PlayerTest::send_player
+        Helper method, sends the passed in packet to try and create a player,
+        does no assertions on the response, just returns it.
+        '''
+        return self.app.post(self.endpoints["players"]["url"],
+                             data=player,
+                             content_type="application/json",
+                             headers=self.json_header)
+
     def test_empty_list(self):
         ''' Test empty player list
         Grabs the player list (which should be initially empty) and makes sure
@@ -67,10 +77,23 @@ class PlayerTest(TestBase):
         data = json.loads(response.data)
         self.assertEqual(data["name"], player["name"])
 
+        response = self.send_player(json.dumps(self.player))
+        self.assertHasStatus(response, httplib.CONFLICT)
+
+    def test_create_bad_player(self):
+        ''' Tests creating a badly formed player
+        '''
+        response = self.register()
+        self.assertHasStatus(response, httplib.CREATED)
+
+        response = self.send_player({"name": "bad"})
+        self.assertHasStatus(response, httplib.BAD_REQUEST)
+
     def test_create_other_player(self):
         ''' Test a DM creating a player for another user
         Creates a player for another user, then checks that the player was
-        properly created.
+        properly created.  Tries to create a second player for a user, should
+        be a conflict.
         '''
         response = self.register()
         self.assertHasStatus(response, httplib.CREATED)
@@ -84,6 +107,26 @@ class PlayerTest(TestBase):
         other_player.update(self.player)
         self.create_player(other_player)
         self.create_player(self.player)
+
+        other_player["name"] = "Newbie"
+        response = self.send_player(json.dumps(other_player))
+        self.assertHasStatus(response, httplib.CONFLICT)
+
+    def test_create_other_player_no_perms(self):
+        ''' Test a non DM creating a player for another user
+        Creates a player for another user, should fail as the user shouldnt
+        have permissions
+        '''
+        response = self.register()
+        self.assertHasStatus(response, httplib.CREATED)
+        id = json.loads(response.data)
+        self.assertTrue(self.logout(), "Logout failed.")
+
+        response = self.register({"username": "herp", "password": "derp"})
+        other_player = {'user': id}
+        other_player.update(self.player)
+        response = self.send_player(json.dumps(other_player))
+        self.assertHasStatus(response, httplib.UNAUTHORIZED)
 
     def test_edit_player(self):
         ''' Test a user editting their player
@@ -129,8 +172,5 @@ class PlayerTest(TestBase):
         self.assertHasStatus(response, httplib.CREATED)
         self.create_player(self.player)
 
-        response = self.app.post(self.endpoints["players"]["url"],
-                                 data=json.dumps(self.player),
-                                 content_type="application/json",
-                                 headers=self.json_header)
+        response = self.send_player(json.dumps(self.player))
         self.assertHasStatus(response, httplib.CONFLICT)

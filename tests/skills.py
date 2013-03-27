@@ -39,6 +39,25 @@ class SkillTest(TestBase):
         TestBase.setUp(self)
         self.register(self.root_user)
 
+    def send_skill(self, skill):
+        ''' SkillTest::send_skill
+        Helper method, sends the passed in packet to try and create a skill,
+        does no assertions on the response, just returns it.
+        '''
+        return self.app.post(self.endpoints["skills"]["url"],
+                             data=skill,
+                             content_type="application/json",
+                             headers=self.json_header)
+
+    def get_skill_list(self):
+        ''' SkillTest::get_skill_list
+        Helper method, retrieves the list of skills on the server
+        '''
+        response = self.app.get(self.endpoints["skills"]["url"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        return json.loads(response.data)
+
     def test_create_skill(self):
         ''' Tests creating a basic skill
         Creates a skill, makes sure it returns the correct structure
@@ -52,6 +71,9 @@ class SkillTest(TestBase):
         self.assertEqual(skill["name"], server_version["name"],
                          "Returned skill's name is not the defined name.")
 
+        skill_list = self.get_skill_list()
+        self.assertEqual(len(skill_list), 1)
+
     def test_create_bad_skill(self):
         ''' Tests creating a skill with missing information
         Attempts to create a skill with missing information, makes sure the
@@ -59,10 +81,7 @@ class SkillTest(TestBase):
         '''
         skill = self.skill.copy()
         del skill["name"]
-        response = self.app.post(self.endpoints["skills"]["url"],
-                                 data=json.dumps(skill),
-                                 content_type="application/json",
-                                 headers=self.json_header)
+        response = self.send_skill(json.dumps(skill))
         self.assertHasStatus(response, httplib.BAD_REQUEST)
 
     def test_apply_new_skill(self):
