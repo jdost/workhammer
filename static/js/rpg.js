@@ -632,6 +632,36 @@ window.rpg = (function (lib) {
       }
     });
   };
+  /** classes.modify
+      args: class - (Class object) original class object for the class being
+              modified
+            details - (hash table) describes the new properties of the class, must
+              include the 'url' property of an existing class
+
+    Takes the hash table and tries to send it to the backend as a modification set
+    on the class passed in.
+   **/
+  lib.classes.modify = function (cls, details, cb) {
+    if (!isObject(cls)) { return false; }
+    if (!isObject(details)) { return false; }
+
+    cb = cb || {};
+    var url = getURL(cls, false);
+    if (!url) { return false; }
+
+    return ajax({
+      url: url,
+      type: 'PUT',
+      contentType: 'application/json',
+      data: details,
+      success: function (data) {
+        if (isFunction(cb.success)) { cb.success(data); }
+      },
+      error: function (msg, xhr) {
+        if (isFunction(cb.error)) { cb.error(msg, xhr); }
+      }
+    });
+  };
   // }}}
 
   // utils {{{

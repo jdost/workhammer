@@ -102,7 +102,7 @@
         win.append(templates[user.roles.isDM ? "edit" : "read"](cls))
           .render()
           .on("submit", function (evt) {
-            rpg.classes.modify(current, lib.getForm(evt.target), {
+            rpg.classes.modify(cls, lib.getForm(evt.target), {
               "success": function (data) { win.trigger('success', data); }
             });
 
@@ -130,7 +130,6 @@
     });
   };
 
-  var skills;
   var showBuilder = function () {
     var win = lib.window("classes builder");
 
@@ -140,18 +139,14 @@
 
       var skillWin = lib.window("classes skillChooser");
 
-      if (!skills) {
-        rpg.skill.get({
-          "success": function (skills_) {
-            skills = skills_;
-            skillWin.append(templates.skills({ "skills": skills }))
-              .center()
-              .focus();
-          }
-        });
-      } else {
-        skillWin.append(templates.skills({ "skills": skills }));
-      }
+      rpg.skill.get({
+        "success": function (skills_) {
+          skills = skills_;
+          skillWin.append(templates.skills({ "skills": skills }))
+            .center()
+            .focus();
+        }
+      });
 
       skillWin.render()
         .on("submit", function (evt_) {
