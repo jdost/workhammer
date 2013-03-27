@@ -21,6 +21,8 @@
         if (id < 0) { id = els.length-1; }
         else if (id >= els.length) { id = 0; }
         els[id].focus();
+
+        if (evt.target.nodeName === 'SELECT') { evt.preventDefault(); }
       }
     });
   };
