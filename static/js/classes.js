@@ -41,10 +41,11 @@
       */}),
     "skills": lib.template(function () {/*
       <form action="">
-        <select name="skill_id">
+        <div class="select"><select name="skill_id">
         <% _.each(skills, function (skill) { %>
           <option value="{{ skill.id }}">{{ skill.name }}</option>
         <% }); %>
+        </select></div>
         <input type="text" name="bonus" placeholder="XP per Skill level" />
         <input type="submit" value="Add skill" />
         <button type="cancel">Cancel</button>
