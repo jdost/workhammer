@@ -1,10 +1,9 @@
-''' settings.py_template
+''' settings.py
 This is where all of the instance specific settings are controlled, you just
 modify these values for your own needs.  Additional instance specific settings
 can be added here.
 '''
 DEBUG = True  # change to False for a Prod environment, enables debug handlers
-SECRET_KEY = "ChangeMeIShouldBeASecret"  # should be unique to your instance
 SESSION_KEY = "rpg_session"
 MONGO_HOST = {
     "host": "localhost",  # Address of the machine hosting the service
@@ -23,3 +22,15 @@ SERVING = {
     "host": "0.0.0.0",
     "port": 5000
 }
+
+# Generates the secret key
+import os.path
+import os
+__SECRET_FILE = "./.SECRET"
+if not os.path.exists(__SECRET_FILE):
+    __file = open(__SECRET_FILE, "w")
+    __file.write(os.urandom(32).encode('base_64'))
+    __file.close()
+
+__file = open(__SECRET_FILE, "r")
+SECRET_KEY = __file.read()
