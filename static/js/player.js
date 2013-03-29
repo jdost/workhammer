@@ -112,7 +112,8 @@
     });
   };
 
-  var showPlayer = exports.showPlayer = function (player_) {
+  var showPlayer = exports.showPlayer = function (evt, player_) {
+    player_ = player_ || evt;
     var win = lib.window("player viewer single");
     var edittable = typeof player_ !== "object";
     var player, quests, skills, classes;
