@@ -17,6 +17,9 @@
       if (!user) { return false; }
       return user.roles.isPlayer;
     }
+  })
+  .add("Player List", {
+    "exec": function () { return showList(); }
   });
   // Template definition
   var templates = {
@@ -71,6 +74,11 @@
       <h1>{{ name }}</h1>
       <div>{{ bio }}</div>
       <button type="cancel">Close</button>
+      */}),
+    "list": lib.template(function () {/*
+      <% _.each(players, function (player) { %>
+        <a href="{{ player.url }}">{{ player.name }}</a>
+      <% }); %>
       */})
   };
 
@@ -83,6 +91,25 @@
       .on("success", showPlayer)
       .on("success", window.user.reload)
       .on("success", win.remove);
+  };
+
+  var showList = exports.showList = function () {
+    var win = lib.window("player list");
+
+    rpg.player.get({
+      "success": function (players) {
+        win.append(templates.list({ "players": players }))
+          .on("click", "a", function (evt) {
+            var $anchor = $(evt.target);
+            showPlayer($anchor.attr("href"));
+
+            evt.stopPropagation();
+            evt.preventDefault();
+            return false;
+          })
+          .render();
+      }
+    });
   };
 
   var showPlayer = exports.showPlayer = function (player_) {
@@ -139,9 +166,9 @@
 
     if (!player_) {
       player = window.user.getUser().player;
-      rpg.player.get(player, { success: function (p) { player = p; render(); } });
     } else { player = player_; }
 
+    rpg.player.get(player, { success: function (p) { player = p; render(); } });
     rpg.quest.get({ success: function (q) { quests = q; render(); } });
     rpg.skill.get({ success: function (s) { skills = s; render(); } });
     rpg.classes.get({ success: function (c) { classes = c; render(); } });
