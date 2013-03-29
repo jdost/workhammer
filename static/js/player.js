@@ -85,9 +85,9 @@
       .on("success", win.remove);
   };
 
-  var showPlayer = exports.showPlayer = function (player) {
+  var showPlayer = exports.showPlayer = function (player_) {
     var win = lib.window("player viewer single");
-    var edittable = typeof player !== "object";
+    var edittable = typeof player_ !== "object";
     var player, quests, skills, classes;
     var render = function () {
       if (!_.all([player, quests, skills, classes])) { return; }
@@ -137,9 +137,11 @@
         .focus();
       };
 
-    if (!player) { player = window.user.getUser().player; }
+    if (!player_) {
+      player = window.user.getUser().player;
+      rpg.player.get(player, { success: function (p) { player = p; render(); } });
+    } else { player = player_; }
 
-    rpg.player.get(player, { success: function (p) { player = p; render(); } });
     rpg.quest.get({ success: function (q) { quests = q; render(); } });
     rpg.skill.get({ success: function (s) { skills = s; render(); } });
     rpg.classes.get({ success: function (c) { classes = c; render(); } });
