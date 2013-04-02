@@ -36,11 +36,11 @@
       */}),
     "rewards": lib.template(function () {/*
       <form action="">
-        <select name="skill_id">
+        <div class="select"><select name="skill_id">
           <% _.each(skills, function (skill) { %>
           <option value="{{ skill.id }}">{{ skill.name }}</option>
           <% }); %>
-        </select>
+        </select></div>
         <input type="text" name="reward"  placeholder="SP reward" />
         <input type="submit" value="Add reward" />
         <button type="cancel">Close</button>
@@ -160,9 +160,9 @@
     win.render();
   };
 
-  var skills;
   var showBuilder = function () {
     var win = lib.window("quests builder");
+    var skills;
 
     var rewardBuilder = function (evt) {
       var choiceWin = lib.window("quests reward");

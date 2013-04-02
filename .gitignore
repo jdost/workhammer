@@ -1,5 +1,6 @@
 *.pyc
 .SECRET
+static/css
 
 env/*
 .env/*
