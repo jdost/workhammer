@@ -26,7 +26,9 @@ SERVING = {
 # Generates the secret key
 import os.path
 import os
-__SECRET_FILE = "./.SECRET"
+PROJ_ROOT = os.path.dirname(os.path.abspath(__file__))
+__SECRET_FILE = os.path.join(os.path.normpath(PROJ_ROOT + "/.."), ".SECRET")
+
 if not os.path.exists(__SECRET_FILE):
     __file = open(__SECRET_FILE, "w")
     __file.write(os.urandom(32).encode('base_64'))
