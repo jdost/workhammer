@@ -23,21 +23,15 @@ Finally mongo is needed for the Database side of the application.
 
 ## Setup
 
-For setup, if you have virtualenvwrapper and make installed you can just run:
+To set up, have [Vagrant](http://docs.vagrantup.com/v2/installation/index.html)
+installed.  Then just run the command:
 ```
-make init
+vagrant up
 ```
-
-For those who do not, you can make a virtualenv (I recommend something like .env or
-venv), activate it, then pip install the requirements, copy the template settings
-file (described below), and it should be good to go.  (I would like to write a
-better setup script, probably a setup.py file at some point).  So for Linux:
-```
-virtualenv .env
-source .env/bin/activate
-pip install -r requirements.txt
-python serve.py
-```
+from within the project directory, after about 10 minutes, you have a VM running
+the application.  Go to http://127.0.0.1:8080/ and it should be served.  You can
+edit anything in the folder and it will be reflected on the VM.  If you want to
+dig around on the VM, just use `vagrant ssh`.
 
 ## Settings
 
@@ -65,3 +59,7 @@ level capacity).  The current settings are:
   values filled in by default)
 * **SERVING** a dictionary passed into the debug server on how the page is being
   served including the host and port
+
+## License
+
+Licensed under the [Apache 2.0](LICENSE) license
