@@ -36,7 +36,6 @@ better setup script, probably a setup.py file at some point).  So for Linux:
 virtualenv .env
 source .env/bin/activate
 pip install -r requirements.txt
-cp rpg/settings.py_template rpg/settings.py
 python serve.py
 ```
 

@@ -1,0 +1,9 @@
+[program:<%= name %>]
+command=<%= command %>
+process_name=<%= name %>
+numprocs=<%= numprocs %>
+<% if user -%>user=<%= user %><% end -%>
+stdout_logfile=/var/log/supervisor/<%= name %>.log
+stderr_logfile=/var/log/supervisor/<%= name %>.err.log
+autostart=true
+autorestart=true
