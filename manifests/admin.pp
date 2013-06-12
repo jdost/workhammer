@@ -1,7 +1,6 @@
-package { 'zsh':
-   ensure      => present,
-   before      => User['vagrant'],
-}
+exec { 'update': command => "/usr/bin/apt-get update", }
+
+package { 'ncurses-term': ensure => present, require => Exec['update'], }
 
 user { 'vagrant':
    ensure      => present,
@@ -10,12 +9,15 @@ user { 'vagrant':
    managehome  => true,
 }
 
+package { 'zsh':
+   ensure  => present,
+   before  => User['vagrant'],
+   require => Exec['update'],
+}
+
 file { '/home/vagrant/.zshrc':
    ensure  => file,
    mode    => 644,
    require => User['vagrant'],
 }
 
-package { 'ncurses-term':
-   ensure => present,
-}

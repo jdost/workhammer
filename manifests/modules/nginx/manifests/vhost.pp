@@ -2,7 +2,7 @@ define nginx::vhost (
    $folder,
    $vhost = '',
    $port = "5000",
-   $static_folder = "/s",
+   $static_folder = "/s/",
    $static_location = '',
 ) {
    if $static_location == '' {
