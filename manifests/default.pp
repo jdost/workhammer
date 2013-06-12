@@ -33,5 +33,5 @@ supervisor::service { 'workhammer':
 nginx::vhost { 'workhammer':
    folder          => '/opt/workhammer',
    port            => "5000",
-   static_location => "/opt/workhammer/static",
+   static_location => "/opt/workhammer/static/",
 }
