@@ -7,7 +7,8 @@ completed by players.
 from flask import session, request, redirect, url_for
 from . import app, filter_keys
 from . import roles, logger, skills
-from .decorators import datatype, require_permissions, intersect
+from .decorators import datatype, require_permissions, intersect, cached, \
+    mark_dirty
 from .database import Quest, QuestLog, errors, Player
 import httplib
 # Keys that the user cannot directly change (controlled by app)
@@ -37,6 +38,7 @@ def create_quest():
         logger.info(err)
         return "Packet missing required keys", httplib.BAD_REQUEST
 
+    mark_dirty(request.path)
     return info, httplib.CREATED
 
 
@@ -64,11 +66,13 @@ def modify_quest(quest_id):
         logger.info(err)
         return "Trying to modify a non existent skill", httplib.BAD_REQUEST
 
+    mark_dirty(request.path)
     return redirect(url_for('get_quest', quest_id=quest_id)) \
         if request.is_html else (quest_info, httplib.ACCEPTED)
 
 
 @app.endpoint("/quest", methods=["GET"])
+@cached
 @datatype
 def quests():
     ''' quests -> GET /quest
@@ -78,6 +82,7 @@ def quests():
 
 
 @app.route("/quest/<quest_id>", methods=["GET"])
+@cached
 @datatype
 def get_quest(quest_id):
     ''' get_quest -> GET /quest/<quest_id>

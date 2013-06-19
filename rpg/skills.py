@@ -6,7 +6,7 @@ that go up upon the completion of quests.
 from flask import request, session, redirect, url_for
 from . import app, filter_keys, calc_level
 from . import roles, logger, settings
-from .decorators import datatype, require_permissions
+from .decorators import datatype, require_permissions, cached, mark_dirty
 from .classes import update_class
 from .database import Skill, Player, errors
 import httplib
@@ -40,10 +40,12 @@ def create_skill():
         logger.info(err)
         return "Packet missing required keys", httplib.BAD_REQUEST
 
+    mark_dirty(request.path)
     return info, httplib.CREATED
 
 
 @app.endpoint("/skill", methods=["GET"])
+@cached
 @datatype
 def skills():
     ''' skills -> GET /skill
@@ -53,6 +55,7 @@ def skills():
 
 
 @app.route("/skill/<skill_id>", methods=["GET"])
+@cached
 @datatype
 def get_skill(skill_id):
     ''' get_skill -> GET /skill/<skill_id>
@@ -91,6 +94,7 @@ def modify_skill(skill_id):
         logger.info(err)
         return "Trying to modify a non existent skill", httplib.BAD_REQUEST
 
+    mark_dirty(request.path)
     return redirect(url_for('get_skill', skill_id=skill_id)) \
         if request.is_html else (skill_info, httplib.ACCEPTED)
 

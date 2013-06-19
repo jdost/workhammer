@@ -8,7 +8,8 @@ from bson.objectid import ObjectId
 from . import app, filter_keys
 from . import roles, logger
 from .database import Player, QuestLog, errors, User
-from .decorators import datatype, require_permissions, intersect
+from .decorators import datatype, require_permissions, intersect, cached, \
+    mark_dirty
 import httplib
 # Keys that the user cannot directly change (controlled by app)
 reserved_keys = ["experience"]
@@ -72,12 +73,14 @@ def create_player():
         logger.info(err)
         return "Packet missing required keys", httplib.BAD_REQUEST
 
+    mark_dirty(request.path)
     return redirect(url_for('get_player', player_id=id)) \
         if request.is_html else (info, httplib.CREATED)
 
 
 @app.endpoint("/player", methods=["GET"])
-@datatype("players.html")
+@cached
+@datatype
 def players():
     ''' players -> GET /player
     Returns an array of the players
@@ -87,7 +90,8 @@ def players():
 
 
 @app.route("/player/<player_id>", methods=["GET"])
-@datatype("player.html")
+@cached
+@datatype
 def get_player(player_id):
     ''' get_player -> GET /player/<id>
         GET: quests=<something>
@@ -128,5 +132,6 @@ def modify_player(player_id):
         logger.info(err)
         return "Trying to modify a non existent player", httplib.BAD_REQUEST
 
+    mark_dirty(request.path)
     return redirect(url_for('get_player', player_id=player_id)) \
         if request.is_html else (player_info, httplib.ACCEPTED)

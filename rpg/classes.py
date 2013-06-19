@@ -8,7 +8,7 @@ constitute the total level of the player.
 from flask import session, request, redirect, url_for
 from . import app, filter_keys, calc_level
 from . import roles, logger
-from .decorators import datatype, require_permissions
+from .decorators import datatype, require_permissions, cached, mark_dirty
 from .database import Class, Player, errors
 import httplib
 # Keys that the user cannot directly change (controlled by the app)
@@ -38,10 +38,12 @@ def create_class():
         logger.info(err)
         return "Packet missing required keys", httplib.BAD_REQUEST
 
+    mark_dirty(request.path)
     return info, httplib.CREATED
 
 
 @app.endpoint("/class", methods=["GET"])
+@cached
 @datatype
 def classes():
     ''' classes -> GET /class
@@ -51,6 +53,7 @@ def classes():
 
 
 @app.route("/class/<class_id>", methods=["GET"])
+@cached
 @datatype
 def get_class(class_id):
     ''' get_class -> GET /class/<class_id>
@@ -88,6 +91,7 @@ def modify_class(class_id):
         logger.info(err)
         return "Trying to modify a non existent class", httplib.BAD_REQUEST
 
+    mark_dirty(request.path)
     return redirect(url_for('get_class', class_id=class_id)) \
         if request.is_html else (class_info, httplib.ACCEPTED)
 

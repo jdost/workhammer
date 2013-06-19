@@ -13,6 +13,8 @@ def cleanup():
     Helper function used for testing, cleans up the app's database and
     environment during a testing.
     '''
+    from .decorators import cache
+    cache.clear()
     database.cleanup()
 
 

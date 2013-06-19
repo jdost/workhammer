@@ -10,9 +10,14 @@ from bson.objectid import ObjectId
 from flask import request, make_response, session, abort, render_template, \
     Flask
 from werkzeug import BaseResponse
+from werkzeug.contrib.cache import SimpleCache
 from . import settings
 from .database import User
+from hashlib import md5
 import httplib
+
+cache = SimpleCache()
+cache_lookup = {}
 
 
 def intersect(a, b):
@@ -184,3 +189,44 @@ def require_permissions(*roles):
         return decorator(f)
     else:
         return decorator
+
+
+def cached(func):
+    ''' cached decorator:
+    '''
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        request.full_path = request.url.lstrip(request.url_root)
+        doc = cache.get(request.full_path)
+        if doc is None:
+            response = func(*args, **kwargs)
+            etag = md5(response.data).hexdigest()
+            response.headers.add('ETag', etag)
+
+            temp = cache_lookup.setdefault(request.path, [])
+            temp.append(request.full_path)
+            cache_lookup[request.path] = temp
+
+            cache.set(request.full_path, {
+                "hash": etag,
+                "doc": response
+            })
+
+            return response
+
+        if "If-None-Match" in request.headers:
+            if request.headers["If-None-Match"] != doc["hash"]:
+                return make_response("", httplib.NOT_MODIFIED)
+
+        return doc["doc"]
+
+    return decorated_function
+
+
+def mark_dirty(*args):
+    ''' mark_dirty:
+    '''
+    for path in args:
+        if path in cache_lookup:
+            cache.delete_many(*cache_lookup[path])
+            del cache_lookup[path]
