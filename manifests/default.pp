@@ -1,3 +1,12 @@
+$dev = $environment == "development"
+$prod = $environment == "production"
+
+
+if $::osfamily == 'Debian' {
+   exec { 'update': command => "/usr/bin/apt-get update", }
+} else {
+   exec { 'update': command => "echo hi", }
+}
 # Install dependencies
 include mongo
 include nginx
@@ -34,4 +43,12 @@ nginx::vhost { 'workhammer':
    folder          => '/opt/workhammer',
    port            => "5000",
    static_location => "/opt/workhammer/static/",
+}
+
+if $dev {
+   include "admin"
+   exec { 'dependencies-dev':
+      require => [ Package['python-pip'], File['/opt/workhammer'] ],
+      command => "/usr/bin/pip install -r /opt/workhammer/requirements.dev.txt",
+   }
 }
