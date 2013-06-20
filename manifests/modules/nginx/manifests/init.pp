@@ -2,12 +2,6 @@ class nginx {
    $numprocs = 1
    $logdir = "/var/log/nginx"
 
-   if $::osfamily == 'debian' {
-      exec { 'update': command => "/usr/bin/apt-get update", }
-   } else {
-      exec { 'update': command => "echo hi", }
-   }
-
    package { 'nginx': ensure => installed, require => Exec['update'], }
 
    file { 'nginx':
