@@ -16,8 +16,7 @@ from .database import User
 from hashlib import md5
 import httplib
 
-cache = SimpleCache()
-cache_lookup = {}
+cache = SimpleCache(threshold=100, default_timeout=10)
 
 
 def intersect(a, b):
@@ -196,18 +195,13 @@ def cached(func):
     '''
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        request.full_path = request.url.lstrip(request.url_root)
-        doc = cache.get(request.full_path)
+        doc = cache.get(request.path)
         if doc is None:
             response = func(*args, **kwargs)
             etag = md5(response.data).hexdigest()
             response.headers.add('ETag', etag)
 
-            temp = cache_lookup.setdefault(request.path, [])
-            temp.append(request.full_path)
-            cache_lookup[request.path] = temp
-
-            cache.set(request.full_path, {
+            cache.set(request.path, {
                 "hash": etag,
                 "doc": response
             })
@@ -215,7 +209,7 @@ def cached(func):
             return response
 
         if "If-None-Match" in request.headers:
-            if request.headers["If-None-Match"] != doc["hash"]:
+            if request.headers["If-None-Match"] == doc["hash"]:
                 return make_response("", httplib.NOT_MODIFIED)
 
         return doc["doc"]
@@ -226,7 +220,4 @@ def cached(func):
 def mark_dirty(*args):
     ''' mark_dirty:
     '''
-    for path in args:
-        if path in cache_lookup:
-            cache.delete_many(*cache_lookup[path])
-            del cache_lookup[path]
+    cache.delete_many(*args)

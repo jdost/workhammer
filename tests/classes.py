@@ -207,3 +207,38 @@ class ClassTest(TestBase):
         self.assertHasStatus(response, httplib.OK)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1, "Leader board is incorrect size.")
+
+    def test_caching(self):
+        ''' Tests getting caching with class creation/modification
+        Grabs a class list, then grabs again, checking that it is cached. Then
+        creates a class.  Makes sure the new class list wasn't cached, grabs
+        again, making sure it is cached now, then modifies the created class
+        and checks the class list for being cached.
+        '''
+        response = self.app.get(self.endpoints["classes"]["url"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        headers = self.json_header
+        headers.append(('If-None-Match', response.headers.get("ETag")))
+        response = self.app.get(self.endpoints["classes"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        cls = self.create_class(self.default_class)
+        response = self.app.get(self.endpoints["classes"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.OK)
+        headers = self.json_header
+        headers.append(('If-None-Match', response.headers.get("ETag")))
+        response = self.app.get(self.endpoints["classes"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        cls["name"] = "Modified Class"
+        response = self.app.put(cls["url"], data=json.dumps(cls),
+                                content_type="application/json",
+                                headers=headers)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+        response = self.app.get(self.endpoints["classes"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.OK)

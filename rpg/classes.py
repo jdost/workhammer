@@ -14,8 +14,10 @@ import httplib
 # Keys that the user cannot directly change (controlled by the app)
 reserved_keys = ["created", "created_by", "modified", "modified_by"]
 
+BASE_PATH = "/class"
 
-@app.route("/class", methods=["POST"])
+
+@app.route(BASE_PATH, methods=["POST"])
 @datatype
 @require_permissions(roles.ROOT, roles.ADMIN)
 def create_class():
@@ -42,7 +44,7 @@ def create_class():
     return info, httplib.CREATED
 
 
-@app.endpoint("/class", methods=["GET"])
+@app.endpoint(BASE_PATH, methods=["GET"])
 @cached
 @datatype
 def classes():
@@ -52,7 +54,7 @@ def classes():
     return Class.all()
 
 
-@app.route("/class/<class_id>", methods=["GET"])
+@app.route(BASE_PATH + "/<class_id>", methods=["GET"])
 @cached
 @datatype
 def get_class(class_id):
@@ -68,7 +70,7 @@ def get_class(class_id):
     return class_info
 
 
-@app.route("/class/<class_id>", methods=["PUT"])
+@app.route(BASE_PATH + "/<class_id>", methods=["PUT"])
 @datatype
 def modify_class(class_id):
     ''' modify_class -> PUT /class/<class_id>
@@ -91,12 +93,12 @@ def modify_class(class_id):
         logger.info(err)
         return "Trying to modify a non existent class", httplib.BAD_REQUEST
 
-    mark_dirty(request.path)
+    mark_dirty(BASE_PATH, request.path)
     return redirect(url_for('get_class', class_id=class_id)) \
         if request.is_html else (class_info, httplib.ACCEPTED)
 
 
-@app.route("/class/<class_id>/leaders", methods=["GET"])
+@app.route(BASE_PATH + "/<class_id>/leaders", methods=["GET"])
 @datatype
 def get_class_leaders(class_id):
     ''' get_class_leaders -> GET /class/<class_id>/leaders
