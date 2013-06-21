@@ -217,3 +217,37 @@ class QuestTest(TestBase):
 
         self.assertEqual(new_quest["name"], quest_name)
         self.assertNotEqual(new_quest["name"], orig_quest["name"])
+
+    def test_caching(self):
+        ''' Tests getting caching with quest creation/modification
+        Grabs a quests list, then grabs again, checking that it is cached. Then
+        creates a quest.  Makes sure the new quest list wasn't cached, grabs
+        again, making sure it is cached now, then modifies the created quest
+        and checks the quest list for being cached.
+        '''
+        response = self.app.get(self.endpoints["quests"]["url"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        headers = self.json_header
+        headers.append(('If-None-Match', response.headers.get("ETag")))
+        response = self.app.get(self.endpoints["quests"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        quest = self.create_quest(self.quest)
+        response = self.app.get(self.endpoints["quests"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.OK)
+        headers = self.json_header
+        headers.append(('If-None-Match', response.headers.get("ETag")))
+        response = self.app.get(self.endpoints["quests"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        response = self.app.put(
+            quest["url"], data=json.dumps({"name": "changed"}),
+            content_type="application/json", headers=headers)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+        response = self.app.get(self.endpoints["quests"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.OK)

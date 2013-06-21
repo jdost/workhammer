@@ -179,3 +179,38 @@ class SkillTest(TestBase):
         self.assertHasStatus(response, httplib.OK)
         data = json.loads(response.data)
         self.assertEqual(len(data), 1, "Leader board is incorrect size.")
+
+    def test_caching(self):
+        ''' Tests getting caching with skill creation/modification
+        Grabs a skills list, then grabs again, checking that it is cached. Then
+        creates a skill.  Makes sure the new skill list wasn't cached, grabs
+        again, making sure it is cached now, then modifies the created skill
+        and checks the skill list for being cached.
+        '''
+        response = self.app.get(self.endpoints["skills"]["url"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        headers = self.json_header
+        headers.append(('If-None-Match', response.headers.get("ETag")))
+        response = self.app.get(self.endpoints["skills"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        skill = self.create_skill(self.skill)
+        response = self.app.get(self.endpoints["skills"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.OK)
+        headers = self.json_header
+        headers.append(('If-None-Match', response.headers.get("ETag")))
+        response = self.app.get(self.endpoints["skills"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        skill["name"] = "Modified Class"
+        response = self.app.put(skill["url"], data=json.dumps(skill),
+                                content_type="application/json",
+                                headers=headers)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+        response = self.app.get(self.endpoints["skills"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.OK)

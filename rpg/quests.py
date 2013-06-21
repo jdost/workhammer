@@ -14,8 +14,10 @@ import httplib
 # Keys that the user cannot directly change (controlled by app)
 reserved_keys = ["created", "created_by", "modified", "modified_by"]
 
+BASE_PATH = "/quest"
 
-@app.route("/quest", methods=["POST"])
+
+@app.route(BASE_PATH, methods=["POST"])
 @datatype
 @require_permissions(roles.ROOT, roles.ADMIN)
 def create_quest():
@@ -42,7 +44,7 @@ def create_quest():
     return info, httplib.CREATED
 
 
-@app.route("/quest/<quest_id>", methods=["PUT"])
+@app.route(BASE_PATH + "/<quest_id>", methods=["PUT"])
 @datatype
 @require_permissions(roles.ROOT, roles.ADMIN)
 def modify_quest(quest_id):
@@ -66,12 +68,12 @@ def modify_quest(quest_id):
         logger.info(err)
         return "Trying to modify a non existent skill", httplib.BAD_REQUEST
 
-    mark_dirty(request.path)
+    mark_dirty(BASE_PATH, request.path)
     return redirect(url_for('get_quest', quest_id=quest_id)) \
         if request.is_html else (quest_info, httplib.ACCEPTED)
 
 
-@app.endpoint("/quest", methods=["GET"])
+@app.endpoint(BASE_PATH, methods=["GET"])
 @cached
 @datatype
 def quests():
@@ -81,7 +83,7 @@ def quests():
     return Quest.all()
 
 
-@app.route("/quest/<quest_id>", methods=["GET"])
+@app.route(BASE_PATH + "/<quest_id>", methods=["GET"])
 @cached
 @datatype
 def get_quest(quest_id):
@@ -99,7 +101,7 @@ def get_quest(quest_id):
     return quest
 
 
-@app.route("/quest/<quest_id>", methods=["POST"])
+@app.route(BASE_PATH + "/<quest_id>", methods=["POST"])
 @app.route("/player/<player_id>", methods=["POST"])
 @datatype
 @require_permissions

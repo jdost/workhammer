@@ -174,3 +174,69 @@ class PlayerTest(TestBase):
 
         response = self.send_player(json.dumps(self.player))
         self.assertHasStatus(response, httplib.CONFLICT)
+
+    def test_list_caching(self):
+        ''' Tests list caching with player creation/modification
+        Grabs a player list, then grabs again, checking that it is cached. Then
+        creates a player.  Makes sure the new player list wasn't cached, grabs
+        again, making sure it is cached now, then modifies the created player
+        and checks the player list for being cached.
+        '''
+        response = self.register()
+        self.assertHasStatus(response, httplib.CREATED)
+
+        response = self.app.get(self.endpoints["players"]["url"],
+                                headers=self.json_header)
+        self.assertHasStatus(response, httplib.OK)
+        headers = self.json_header
+        headers.append(('If-None-Match', response.headers.get("ETag")))
+        response = self.app.get(self.endpoints["players"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        player = self.create_player(self.player)
+        response = self.app.get(self.endpoints["players"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.OK)
+        headers = self.json_header
+        headers.append(('If-None-Match', response.headers.get("ETag")))
+        response = self.app.get(self.endpoints["players"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        response = self.app.put(
+            player["url"], data=json.dumps({"name": "Maria"}),
+            content_type="application/json", headers=headers)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+        response = self.app.get(self.endpoints["players"]["url"],
+                                headers=headers)
+        self.assertHasStatus(response, httplib.OK)
+
+    def test_player_caching(self):
+        ''' Tests caching of a single player
+        Creates a player, grabs the player, tries again and ensures it was
+        cached.  Then modifies player, tries again and makes sure the cache
+        was update.
+        '''
+        response = self.register()
+        self.assertHasStatus(response, httplib.CREATED)
+        headers = self.json_header
+
+        player = self.create_player({"name": "Charles"})
+        response = self.app.get(player["url"], headers=headers)
+        self.assertHasStatus(response, httplib.OK)
+        headers.append(('If-None-Match', response.headers.get('ETag')))
+        response = self.app.get(player["url"], headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)
+
+        new_name = "Chuck"
+        response = self.app.put(
+            player["url"], data=json.dumps({"name": new_name}),
+            content_type="application/json", headers=headers)
+        self.assertHasStatus(response, httplib.ACCEPTED)
+        headers = self.json_header
+        response = self.app.get(player["url"], headers=headers)
+        self.assertHasStatus(response, httplib.OK)
+        headers.append(('If-None-Match', response.headers.get('ETag')))
+        response = self.app.get(player["url"], headers=headers)
+        self.assertHasStatus(response, httplib.NOT_MODIFIED)

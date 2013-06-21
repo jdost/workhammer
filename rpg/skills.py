@@ -13,8 +13,10 @@ import httplib
 # Keys that the user cannot directly changed (controlled by the app)
 reserved_keys = ["created", "created_by", "modified", "modified_by"]
 
+BASE_PATH = "/skill"
 
-@app.route("/skill", methods=["POST"])
+
+@app.route(BASE_PATH, methods=["POST"])
 @datatype
 @require_permissions(roles.ROOT, roles.ADMIN)
 def create_skill():
@@ -44,7 +46,7 @@ def create_skill():
     return info, httplib.CREATED
 
 
-@app.endpoint("/skill", methods=["GET"])
+@app.endpoint(BASE_PATH, methods=["GET"])
 @cached
 @datatype
 def skills():
@@ -54,7 +56,7 @@ def skills():
     return Skill.all()
 
 
-@app.route("/skill/<skill_id>", methods=["GET"])
+@app.route(BASE_PATH + "/<skill_id>", methods=["GET"])
 @cached
 @datatype
 def get_skill(skill_id):
@@ -70,7 +72,7 @@ def get_skill(skill_id):
     return skill
 
 
-@app.route("/skill/<skill_id>", methods=["PUT"])
+@app.route(BASE_PATH + "/<skill_id>", methods=["PUT"])
 @datatype
 @require_permissions(roles.ROOT, roles.ADMIN)
 def modify_skill(skill_id):
@@ -94,12 +96,12 @@ def modify_skill(skill_id):
         logger.info(err)
         return "Trying to modify a non existent skill", httplib.BAD_REQUEST
 
-    mark_dirty(request.path)
+    mark_dirty(BASE_PATH, request.path)
     return redirect(url_for('get_skill', skill_id=skill_id)) \
         if request.is_html else (skill_info, httplib.ACCEPTED)
 
 
-@app.route("/skill/<skill_id>/leaders", methods=["GET"])
+@app.route(BASE_PATH + "/<skill_id>/leaders", methods=["GET"])
 @datatype
 def get_skill_leaders(skill_id):
     ''' get_skill_leaders -> GET /skill/<skill_id>/leaders

@@ -14,8 +14,10 @@ import httplib
 # Keys that the user cannot directly change (controlled by app)
 reserved_keys = ["experience"]
 
+BASE_PATH = "/player"
 
-@app.route("/player", methods=["POST"])
+
+@app.route(BASE_PATH, methods=["POST"])
 @datatype
 @require_permissions
 def create_player():
@@ -78,7 +80,7 @@ def create_player():
         if request.is_html else (info, httplib.CREATED)
 
 
-@app.endpoint("/player", methods=["GET"])
+@app.endpoint(BASE_PATH, methods=["GET"])
 @cached
 @datatype
 def players():
@@ -89,7 +91,7 @@ def players():
     return {"players": players} if request.is_html else players
 
 
-@app.route("/player/<player_id>", methods=["GET"])
+@app.route(BASE_PATH + "/<player_id>", methods=["GET"])
 @cached
 @datatype
 def get_player(player_id):
@@ -109,7 +111,7 @@ def get_player(player_id):
     return player
 
 
-@app.route("/player/<player_id>", methods=["PUT"])
+@app.route(BASE_PATH + "/<player_id>", methods=["PUT"])
 @datatype
 @require_permissions
 def modify_player(player_id):
@@ -132,6 +134,6 @@ def modify_player(player_id):
         logger.info(err)
         return "Trying to modify a non existent player", httplib.BAD_REQUEST
 
-    mark_dirty(request.path)
+    mark_dirty(BASE_PATH, request.path)
     return redirect(url_for('get_player', player_id=player_id)) \
         if request.is_html else (player_info, httplib.ACCEPTED)
